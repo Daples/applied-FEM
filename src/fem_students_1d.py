@@ -4,6 +4,7 @@ from scipy.interpolate import _bspl as bspl
 
 from utils.mesh import Mesh
 from utils.param_map import ParamMap
+from utils import eval_func
 
 
 def create_ref_data(neval, deg, integrate=False):
@@ -166,15 +167,56 @@ def create_param_map(mesh: Mesh):
 
 def assemble_fe_problem(mesh, space, ref_data, param_map, problem_B, problem_L, bc):
     """"""
-    # IMPLEMENT HERE
-    # return A, b
+
+    n = space["n"]
+    supported_bases = space["supported_bases"]
+    extraction_coefficients = space["extraction_coefficients"]
+    reference_basis = ref_data["reference_basis"]
+    reference_basis_derivatives = ref_data["reference_basis_derivatives"]
+    evaluation_points = ref_data["evaluation_points"]
+    quad_weights = ref_data["quadrature_weights"]
+    bar_A = np.zeros((n, n))
+    bar_b = np.zeros(n)
+
+    for l in range(mesh.elements.shape[1]):
+        element = mesh.elements[:, l]
+
+        xs = param_map.func(evaluation_points, element[0], element[1])
+        for i_index, i in enumerate(supported_bases[l, :]):
+            ej_i = extraction_coefficients[l][i_index, :]
+            ni = ej_i.dot(reference_basis)
+            dxni = param_map.imap_derivatives[l] * ej_i.dot(reference_basis_derivatives)
+
+            l_val = problem_L(xs, ni, dxni)
+            val = np.sum(
+                param_map.map_derivatives[l] * np.multiply(l_val, quad_weights)
+            )
+            bar_b[i] += val
+
+            for j_index, j in enumerate(supported_bases[l, :]):
+                ej_i = extraction_coefficients[l][j_index, :]
+                nj = ej_i.dot(reference_basis)
+                dxnj = param_map.imap_derivatives[l] * ej_i.dot(
+                    reference_basis_derivatives
+                )
+                b_val = problem_B(xs, ni, dxni, nj, dxnj)
+                val = np.sum(
+                    param_map.map_derivatives[l] * np.multiply(b_val, quad_weights)
+                )
+                bar_A[i, j] += val
+    b = bar_b[1:-1] - bar_A[1:-1, 0] * bc[0] - bar_A[1:-1, -1] * bc[1]
+    A = bar_A[1:-1, 1:-1]
+
+    return A, b
 
 
 def problem_B(x, Nj, dNj, Nk, dNk):
     """"""
-    # IMPLEMENT HERE
+
+    return np.multiply(dNj, dNk)
 
 
 def problem_L(x, Nj, dNj):
     """"""
-    # IMPLEMENT HERE
+
+    return Nj
