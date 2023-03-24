@@ -10,6 +10,7 @@ from fem_students_1d import (
     create_ref_data,
 )
 from utils.plotter import Plotter
+from utils import eval_func
 
 
 class Tests:
@@ -43,22 +44,23 @@ class Tests:
         test_elements = [0, 3, n - 1]
         fig, axs = plt.subplots(len(test_elements), 2)
         fig.tight_layout()
-        for h, j in enumerate(test_elements):
+        for h, test_element in enumerate(test_elements):
+            coefs = np.zeros(n)
+            coefs[test_element] = 1
             for l in range(mesh.elements.shape[1]):
                 element = mesh.elements[:, l]
-                xs = param_map.func(evaluation_points, element[0], element[1])
-                ns = np.zeros_like(xs)
-                dxns = np.zeros_like(xs)
+                xs, ns, dxns = eval_func(
+                    l,
+                    coefs,
+                    element,
+                    param_map,
+                    evaluation_points,
+                    supported_bases,
+                    extraction_coefficients,
+                    reference_basis,
+                    reference_basis_derivatives,
+                )
 
-                aux = supported_bases[l] == j
-                is_supported = aux.any()
-                if is_supported:
-                    index_support = np.where(aux)[0][0]
-                    ej_i = extraction_coefficients[l][index_support, :]
-                    ns = ej_i.dot(reference_basis)
-                    dxns = param_map.imap_derivatives[l] * ej_i.dot(
-                        reference_basis_derivatives
-                    )
                 axs[h][0].plot(xs, ns, "k")
                 axs[h][1].plot(xs, dxns, "k")
 
