@@ -120,9 +120,13 @@ def create_fe_space(deg, reg, mesh):
     }
     return space
 
-def create_mesh(brk):
-    # IMPLEMENT HERE
-    return mesh
+def create_mesh(brk: np.ndarray) -> tuple[int, np.ndarray]:
+    m = brk.shape[0]
+    elements = np.zeros((m, 2))
+    elements[0, :] = brk[:-1]
+    elements[1, :] = brk[1:]
+
+    return m, elements
 
 def create_param_map(mesh):
     # IMPLEMENT HERE
