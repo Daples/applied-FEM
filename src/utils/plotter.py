@@ -26,6 +26,7 @@ class Plotter:
     def __setup_config__() -> None:
         """It sets up the matplotlib configuration."""
 
+    plt.rc("text", usetex=True)
     plt.rcParams.update({"font.size": 11})
 
     @classmethod
