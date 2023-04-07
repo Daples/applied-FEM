@@ -11,7 +11,14 @@ def eval_func(
     extraction_coefficients,
     reference_basis,
     reference_basis_derivatives,
-):
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """It evaluates a function based on coefficients, basis functions and function
+    domain.
+
+    Parameters
+    ----------
+    """
+
     xs = param_map.func(evaluation_points, element[0], element[1])
     ns = np.zeros_like(xs)
     dxns = np.zeros_like(xs)

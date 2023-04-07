@@ -6,7 +6,6 @@ from fem_students_1d import (
     create_fe_space,
     create_ref_data,
 )
-from utils.plotter import Plotter
 from utils import eval_func
 import matplotlib.pyplot as plt
 

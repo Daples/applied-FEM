@@ -1,13 +1,14 @@
+from typing import Any, Callable
+
 import numpy as np
 from numpy.polynomial.legendre import leggauss as gaussquad
 from scipy.interpolate import _bspl as bspl
 
 from utils.mesh import Mesh
 from utils.param_map import ParamMap
-from utils import eval_func
 
 
-def create_ref_data(neval, deg, integrate=False):
+def create_ref_data(neval: int, deg: int, integrate: bool = False) -> dict[str, Any]:
     # reference unit domain
     reference_element = np.array([0, 1])
     if integrate is False:
@@ -26,13 +27,13 @@ def create_ref_data(neval, deg, integrate=False):
     )
     # reference basis function values
     tmp = [
-        bspl.evaluate_all_bspl(knt, deg, evaluation_points[i], deg, nu=0)
+        bspl.evaluate_all_bspl(knt, deg, evaluation_points[i], deg, nu=0)  # type: ignore
         for i in range(evaluation_points.shape[0])
     ]
     reference_basis = np.vstack(tmp).T
     # reference basis function first derivatives
     tmp = [
-        bspl.evaluate_all_bspl(knt, deg, evaluation_points[i], deg, nu=1)
+        bspl.evaluate_all_bspl(knt, deg, evaluation_points[i], deg, nu=1)  # type: ignore
         for i in range(evaluation_points.shape[0])
     ]
     reference_basis_derivatives = np.vstack(tmp).T
@@ -48,8 +49,8 @@ def create_ref_data(neval, deg, integrate=False):
     return reference_data
 
 
-def create_fe_space(deg, reg, mesh):
-    def bezier_extraction(knt, deg):
+def create_fe_space(deg, reg, mesh) -> dict[str, Any]:
+    def bezier_extraction(knt: np.ndarray, deg: int) -> list[np.ndarray]:
         # breakpoints
         brk = np.unique(knt)
         # number of elements
@@ -142,7 +143,6 @@ def create_fe_space(deg, reg, mesh):
 
 
 def create_mesh(brk: np.ndarray) -> Mesh:
-    """"""
     m = brk.shape[0] - 1
     elements = np.zeros((2, m))
     elements[0, :] = brk[:-1]
@@ -151,9 +151,7 @@ def create_mesh(brk: np.ndarray) -> Mesh:
     return Mesh(m, elements)
 
 
-def create_param_map(mesh: Mesh):
-    """"""
-
+def create_param_map(mesh: Mesh) -> ParamMap:
     def func(
         c: float | np.ndarray, lower: np.ndarray | float, upper: np.ndarray | float
     ) -> np.ndarray | float:
@@ -165,9 +163,15 @@ def create_param_map(mesh: Mesh):
     return ParamMap(func, map_derivatives, imap_derivatives)
 
 
-def assemble_fe_problem(mesh, space, ref_data, param_map, problem_B, problem_L, bc):
-    """"""
-
+def assemble_fe_problem(
+    mesh: Mesh,
+    space: dict[str, Any],
+    ref_data: dict[str, Any],
+    param_map: ParamMap,
+    problem_B: Callable,
+    problem_L: Callable,
+    bc: tuple[float, float],
+) -> tuple[np.ndarray, np.ndarray]:
     n = space["n"]
     supported_bases = space["supported_bases"]
     extraction_coefficients = space["extraction_coefficients"]
