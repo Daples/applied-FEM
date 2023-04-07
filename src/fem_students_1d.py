@@ -1,4 +1,4 @@
-from typing import Any, Callable
+from typing import Callable
 
 import numpy as np
 from numpy.polynomial.legendre import leggauss as gaussquad
@@ -6,9 +6,11 @@ from scipy.interpolate import _bspl as bspl
 
 from utils.mesh import Mesh
 from utils.param_map import ParamMap
+from utils.reference_data import ReferenceData
+from utils.space import Space
 
 
-def create_ref_data(neval: int, deg: int, integrate: bool = False) -> dict[str, Any]:
+def create_ref_data(neval: int, deg: int, integrate: bool = False) -> ReferenceData:
     # reference unit domain
     reference_element = np.array([0, 1])
     if integrate is False:
@@ -37,20 +39,19 @@ def create_ref_data(neval: int, deg: int, integrate: bool = False) -> dict[str, 
         for i in range(evaluation_points.shape[0])
     ]
     reference_basis_derivatives = np.vstack(tmp).T
-    # store all data and return
-    reference_data = {
-        "reference_element": reference_element,
-        "evaluation_points": evaluation_points,
-        "quadrature_weights": quadrature_weights,
-        "deg": deg,
-        "reference_basis": reference_basis,
-        "reference_basis_derivatives": reference_basis_derivatives,
-    }
-    return reference_data
+
+    return ReferenceData(
+        deg,
+        evaluation_points,
+        quadrature_weights,
+        reference_element,
+        reference_basis,
+        reference_basis_derivatives,
+    )
 
 
-def create_fe_space(deg, reg, mesh) -> dict[str, Any]:
-    def bezier_extraction(knt: np.ndarray, deg: int) -> list[np.ndarray]:
+def create_fe_space(deg, reg, mesh) -> Space:
+    def bezier_extraction(knt: np.ndarray, deg: int) -> np.ndarray:
         # breakpoints
         brk = np.unique(knt)
         # number of elements
@@ -103,7 +104,7 @@ def create_fe_space(deg, reg, mesh) -> dict[str, Any]:
                 a = b
                 b += 1
             C = C[:nel]
-        return C
+        return np.array(C)
 
     # number of mesh elements
     nel = mesh.m
@@ -137,9 +138,8 @@ def create_fe_space(deg, reg, mesh) -> dict[str, Any]:
             econn[i] = np.arange(deg + 1)
         else:
             econn[i] = econn[i - 1] + mult
-    # save and return
-    space = {"n": dim, "supported_bases": econn, "extraction_coefficients": C}
-    return space
+
+    return Space(dim, econn, C)
 
 
 def create_mesh(brk: np.ndarray) -> Mesh:
@@ -157,7 +157,6 @@ def create_param_map(mesh: Mesh) -> ParamMap:
     ) -> np.ndarray | float:
         return lower + c * (upper - lower)
 
-    m = mesh.m
     map_derivatives = mesh.elements[1, :] - mesh.elements[0, :]  # type: ignore
     imap_derivatives = 1 / map_derivatives
     return ParamMap(func, map_derivatives, imap_derivatives)
@@ -165,62 +164,48 @@ def create_param_map(mesh: Mesh) -> ParamMap:
 
 def assemble_fe_problem(
     mesh: Mesh,
-    space: dict[str, Any],
-    ref_data: dict[str, Any],
+    space: Space,
+    ref_data: ReferenceData,
     param_map: ParamMap,
     problem_B: Callable,
     problem_L: Callable,
     bc: tuple[float, float],
 ) -> tuple[np.ndarray, np.ndarray]:
-    n = space["n"]
-    supported_bases = space["supported_bases"]
-    extraction_coefficients = space["extraction_coefficients"]
-    reference_basis = ref_data["reference_basis"]
-    reference_basis_derivatives = ref_data["reference_basis_derivatives"]
-    evaluation_points = ref_data["evaluation_points"]
-    quad_weights = ref_data["quadrature_weights"]
+    n = space.dim
     bar_A = np.zeros((n, n))
     bar_b = np.zeros(n)
 
     for l in range(mesh.elements.shape[1]):
         element = mesh.elements[:, l]
 
-        xs = param_map.func(evaluation_points, element[0], element[1])
-        for i_index, i in enumerate(supported_bases[l, :]):
-            ej_i = extraction_coefficients[l][i_index, :]
-            ni = ej_i.dot(reference_basis)
-            dxni = param_map.imap_derivatives[l] * ej_i.dot(reference_basis_derivatives)
+        xs = param_map.func(ref_data.evaluation_points, element[0], element[1])
+        for i_index, i in enumerate(space.supported_bases[l, :]):
+            ej_i = space.extraction_coefficients[l, i_index, :]
+            ni = ej_i.dot(ref_data.reference_basis)
+            dxni = param_map.imap_derivatives[l] * ej_i.dot(
+                ref_data.reference_basis_derivatives
+            )
 
             l_val = problem_L(xs, ni, dxni)
             val = np.sum(
-                param_map.map_derivatives[l] * np.multiply(l_val, quad_weights)
+                param_map.map_derivatives[l]
+                * np.multiply(l_val, ref_data.quadrature_weights)
             )
             bar_b[i] += val
 
-            for j_index, j in enumerate(supported_bases[l, :]):
-                ej_i = extraction_coefficients[l][j_index, :]
-                nj = ej_i.dot(reference_basis)
+            for j_index, j in enumerate(space.supported_bases[l, :]):
+                ej_i = space.extraction_coefficients[l, j_index, :]
+                nj = ej_i.dot(ref_data.reference_basis)
                 dxnj = param_map.imap_derivatives[l] * ej_i.dot(
-                    reference_basis_derivatives
+                    ref_data.reference_basis_derivatives
                 )
                 b_val = problem_B(xs, ni, dxni, nj, dxnj)
                 val = np.sum(
-                    param_map.map_derivatives[l] * np.multiply(b_val, quad_weights)
+                    param_map.map_derivatives[l]
+                    * np.multiply(b_val, ref_data.quadrature_weights)
                 )
                 bar_A[i, j] += val
     b = bar_b[1:-1] - bar_A[1:-1, 0] * bc[0] - bar_A[1:-1, -1] * bc[1]
     A = bar_A[1:-1, 1:-1]
 
     return A, b
-
-
-def problem_B(x, Nj, dNj, Nk, dNk):
-    """"""
-
-    return np.multiply(dNj, dNk)
-
-
-def problem_L(x, Nj, dNj):
-    """"""
-
-    return Nj
