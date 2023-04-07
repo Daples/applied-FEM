@@ -42,9 +42,9 @@ def create_ref_data(neval: int, deg: int, integrate: bool = False) -> ReferenceD
 
     return ReferenceData(
         deg,
+        reference_element,
         evaluation_points,
         quadrature_weights,
-        reference_element,
         reference_basis,
         reference_basis_derivatives,
     )
