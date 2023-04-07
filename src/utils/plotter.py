@@ -1,6 +1,7 @@
 import os
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class Plotter:
@@ -43,3 +44,45 @@ class Plotter:
         """
 
         return os.path.join(cls._folder, path)
+
+    @classmethod
+    def plot_results(
+        cls,
+        xs_matrix: np.ndarray,
+        ns_matrix: np.ndarray,
+        dxns_matrix: np.ndarray,
+        filename: str,
+    ) -> None:
+        """It plots the function and derivative evaluation.
+
+        Parameters
+        ----------
+        xs_matrix: numpy.ndarray
+            The matrix of evaluation points (columns) for each element (row).
+        ns_matrix: numpy.ndarray
+            The matrix of function evaluations at each point on the element.
+        dxns_matrix: numpy.ndarray
+            The matrix of derivatives of the function at each point on the element.
+        filename: str
+            The name of the file to writethe figure to.
+        """
+
+        cls.__clear__()
+        cls.__setup_config__()
+
+        fig, axs = plt.subplots(1, 2, figsize=(10, 4))
+        fig.tight_layout(pad=2)
+        m = xs_matrix.shape[0]
+
+        for l in range(m):
+            axs[0].plot(xs_matrix[l, :], ns_matrix[l, :], "k")
+            axs[1].plot(xs_matrix[l, :], dxns_matrix[l, :], "k")
+
+        axs[0].set_xlabel("$x$")
+        axs[0].set_ylabel("$N(x)$")
+        axs[0].grid()
+
+        axs[1].set_xlabel("$x$")
+        axs[1].set_ylabel("$N'(x)$")
+        axs[1].grid()
+        plt.savefig(cls.add_folder(filename), bbox_inches="tight")
