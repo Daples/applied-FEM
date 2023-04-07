@@ -1,9 +1,9 @@
 import numpy as np
 
 from fem_students_1d import (
+    create_fe_space,
     create_mesh,
     create_param_map,
-    create_fe_space,
     create_ref_data,
 )
 from utils import eval_func

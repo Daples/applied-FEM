@@ -1,11 +1,11 @@
 import numpy as np
 
 from fem_students_1d import (
+    assemble_fe_problem,
+    create_fe_space,
     create_mesh,
     create_param_map,
-    create_fe_space,
     create_ref_data,
-    assemble_fe_problem,
 )
 
 

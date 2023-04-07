@@ -1,16 +1,16 @@
 from typing import Callable
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 from fem_students_1d import (
+    create_fe_space,
     create_mesh,
     create_param_map,
-    create_fe_space,
     create_ref_data,
 )
-from utils.plotter import Plotter
 from utils import eval_func
+from utils.plotter import Plotter
 
 
 class Tests:
