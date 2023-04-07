@@ -54,7 +54,8 @@ class Tests:
 
         test_elements = [0, 3, n - 1]
         fig, axs = plt.subplots(len(test_elements), 2)
-        fig.tight_layout()
+        fig.tight_layout(pad=1.5)
+
         for h, test_element in enumerate(test_elements):
             coefs = np.zeros(n)
             coefs[test_element] = 1
@@ -62,11 +63,14 @@ class Tests:
                 element = mesh.elements[:, l]
                 xs, ns, dxns = eval_func(l, coefs, element, param_map, space, ref_data)
 
-                axs[h][0].plot(xs, ns, "k")
-                axs[h][1].plot(xs, dxns, "k")
+                axs[h][0].plot(xs, ns, *Plotter.args, **Plotter.kwargs)
+                axs[h][1].plot(xs, dxns, *Plotter.args, **Plotter.kwargs)
 
             axs[h][0].set_xlabel("$x$")
             axs[h][0].set_ylabel("$N(x)$")
+            axs[h][0].grid()
+
             axs[h][1].set_xlabel("$x$")
             axs[h][1].set_ylabel("$N'(x)$")
+            axs[h][1].grid()
         plt.savefig(Plotter.add_folder(filename), bbox_inches="tight")
