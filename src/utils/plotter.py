@@ -1,3 +1,4 @@
+from typing import Any
 import os
 
 import matplotlib.pyplot as plt
@@ -6,15 +7,20 @@ import numpy as np
 
 class Plotter:
     """A class to wrap the plotting functions.
+
     (Static) Attributes
     -------------------
-    _levels: int
-        The numer of levels for a countour plot.
     _folder: str
         The folder to store the output figures.
+    args: list[Any]
+        The additional arguments for all plots.
+    kwargs: dict[str, Any]
+        The keyword arguments for all plots.
     """
 
     _folder: str = "figs"
+    args: list[Any] = ["-ko"]
+    kwargs: dict[str, Any] = {"markevery": [0, -1], "markersize": 2}
 
     @staticmethod
     def __clear__() -> None:
@@ -64,7 +70,7 @@ class Plotter:
         dxns_matrix: numpy.ndarray
             The matrix of derivatives of the function at each point on the element.
         filename: str
-            The name of the file to writethe figure to.
+            The name of the file to write the figure to.
         """
 
         cls.__clear__()
@@ -75,8 +81,8 @@ class Plotter:
         m = xs_matrix.shape[0]
 
         for l in range(m):
-            axs[0].plot(xs_matrix[l, :], ns_matrix[l, :], "k")
-            axs[1].plot(xs_matrix[l, :], dxns_matrix[l, :], "k")
+            axs[0].plot(xs_matrix[l, :], ns_matrix[l, :], *cls.args, **cls.kwargs)
+            axs[1].plot(xs_matrix[l, :], dxns_matrix[l, :], *cls.args, **cls.kwargs)
 
         axs[0].set_xlabel("$x$")
         axs[0].set_ylabel("$N(x)$")
