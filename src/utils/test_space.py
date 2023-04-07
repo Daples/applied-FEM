@@ -23,7 +23,23 @@ class Tests:
         neval: int,
         filename: str,
     ) -> None:
-        """"""
+        """It creates the plot of the first, fourth and last elements for testing.
+
+        Parameters
+        ----------
+        p: int
+            The degree of the polynomial.
+        k: int
+            The smoothness degree.
+        m: int
+            The number of evaluation points for each basis function.
+        spacing_func: int -> float
+            The function to map the partitions of the testing interval.
+        neval: int
+            The number of quadrature points.
+        filename:
+            The name of the output plot.
+        """
 
         Plotter.__clear__()
         Plotter.__setup_config__()
@@ -34,12 +50,7 @@ class Tests:
         space = create_fe_space(p, k, mesh)
         ref_data = create_ref_data(neval, p, False)
 
-        n = space["n"]
-        supported_bases = space["supported_bases"]
-        extraction_coefficients = space["extraction_coefficients"]
-        reference_basis = ref_data["reference_basis"]
-        reference_basis_derivatives = ref_data["reference_basis_derivatives"]
-        evaluation_points = ref_data["evaluation_points"]
+        n = space.dim
 
         test_elements = [0, 3, n - 1]
         fig, axs = plt.subplots(len(test_elements), 2)
@@ -49,17 +60,7 @@ class Tests:
             coefs[test_element] = 1
             for l in range(mesh.elements.shape[1]):
                 element = mesh.elements[:, l]
-                xs, ns, dxns = eval_func(
-                    l,
-                    coefs,
-                    element,
-                    param_map,
-                    evaluation_points,
-                    supported_bases,
-                    extraction_coefficients,
-                    reference_basis,
-                    reference_basis_derivatives,
-                )
+                xs, ns, dxns = eval_func(l, coefs, element, param_map, space, ref_data)
 
                 axs[h][0].plot(xs, ns, "k")
                 axs[h][1].plot(xs, dxns, "k")
@@ -69,7 +70,3 @@ class Tests:
             axs[h][1].set_xlabel("$x$")
             axs[h][1].set_ylabel("$N'(x)$")
         plt.savefig(Plotter.add_folder(filename), bbox_inches="tight")
-
-    @staticmethod
-    def test_solution(coefs: np.ndarray):
-        """"""
