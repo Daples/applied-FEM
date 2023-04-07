@@ -6,9 +6,17 @@ from fem_students_1d import (
     create_fe_space,
     create_ref_data,
     assemble_fe_problem,
-    problem_B,
-    problem_L,
 )
+
+
+def problem_B(
+    _: np.ndarray, __: np.ndarray, dNj: np.ndarray, ___: np.ndarray, dNk: np.ndarray
+) -> np.ndarray:
+    return np.multiply(dNj, dNk)
+
+
+def problem_L(_: np.ndarray, Nj: np.ndarray, __: np.ndarray) -> np.ndarray:
+    return Nj
 
 
 m = 4
