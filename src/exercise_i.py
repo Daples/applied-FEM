@@ -9,9 +9,6 @@ from fem_students_1d import (
     problem_B,
     problem_L,
 )
-from utils.plotter import Plotter
-from utils import eval_func
-import matplotlib.pyplot as plt
 
 
 m = 4
@@ -20,7 +17,7 @@ k = 0
 L = 2
 neval = 3
 spacing_func = lambda i: i * L / m
-bc = [0, 1]
+bc = (0.0, 1.0)
 
 brk = np.array([spacing_func(i) for i in range(0, m + 1)])
 mesh = create_mesh(brk)
