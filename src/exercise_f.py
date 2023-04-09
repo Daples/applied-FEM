@@ -39,4 +39,6 @@ for current_element in range(m):
     ns_matrix[current_element, :] = ns
     dxns_matrix[current_element, :] = dxns
 
-Plotter.plot_results(xs_matrix, ns_matrix, dxns_matrix, "exercise_f.pdf")
+Plotter.plot_results(
+    xs_matrix, ns_matrix, dxns_matrix, "exercise_f.pdf", result_label="u_h"
+)

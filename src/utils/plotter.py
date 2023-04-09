@@ -58,6 +58,7 @@ class Plotter:
         ns_matrix: np.ndarray,
         dxns_matrix: np.ndarray,
         filename: str,
+        result_label: str = "N",
     ) -> None:
         """It plots the function and derivative evaluation.
 
@@ -71,6 +72,8 @@ class Plotter:
             The matrix of derivatives of the function at each point on the element.
         filename: str
             The name of the file to write the figure to.
+        result_label: str, optional
+            The result ylabel on the plot. Default: "N".
         """
 
         cls.__clear__()
@@ -84,11 +87,14 @@ class Plotter:
             axs[0].plot(xs_matrix[l, :], ns_matrix[l, :], *cls.args, **cls.kwargs)
             axs[1].plot(xs_matrix[l, :], dxns_matrix[l, :], *cls.args, **cls.kwargs)
 
-        axs[0].set_xlabel("$x$")
-        axs[0].set_ylabel("$N(x)$")
+        xlabel = "$x$"
+        ylabel = f"${result_label}(x)$"
+        ylabel_p = f"${result_label}'(x)$"
+        axs[0].set_xlabel(xlabel)
+        axs[0].set_ylabel(ylabel)
         axs[0].grid()
 
-        axs[1].set_xlabel("$x$")
-        axs[1].set_ylabel("$N'(x)$")
+        axs[1].set_xlabel(xlabel)
+        axs[1].set_ylabel(ylabel_p)
         axs[1].grid()
         plt.savefig(cls.add_folder(filename), bbox_inches="tight")

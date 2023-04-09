@@ -76,4 +76,6 @@ for l in range(mesh.elements.shape[1]):
     dxns_matrix[l, :] = dxns
 
 # Plot
-Plotter.plot_results(xs_matrix, ns_matrix, dxns_matrix, "exercise_o.pdf")
+Plotter.plot_results(
+    xs_matrix, ns_matrix, dxns_matrix, "exercise_o.pdf", result_label="u_h"
+)
