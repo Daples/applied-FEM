@@ -8,7 +8,7 @@ from utils.space import Space
 
 
 def eval_func(
-    l: int,
+    current_element: int,
     coefs: np.ndarray,
     element: np.ndarray,
     param_map: ParamMap,
@@ -20,9 +20,11 @@ def eval_func(
 
     Parameters
     ----------
-    coefs: np.ndarray
+    curent_element: int
+        The index of the current element.
+    coefs: numpy.ndarray
         The coefficients of the basis functions for the current element.
-    element:
+    element: numpy.ndarray
         The current element.
     param_map: utils.param_map.ParamMap
         The parametric map object.
@@ -37,12 +39,12 @@ def eval_func(
     )
     ns = np.zeros_like(xs)
     dxns = np.zeros_like(xs)
-    for i, j in enumerate(space.supported_bases[l, :]):
-        ej_i = space.extraction_coefficients[l, i, :]
+    for i, j in enumerate(space.supported_bases[current_element, :]):
+        ej_i = space.extraction_coefficients[current_element, i, :]
         ns += coefs[j] * ej_i.dot(ref_data.reference_basis)
         dxns += (
             coefs[j]
-            * param_map.imap_derivatives[l]
+            * param_map.imap_derivatives[current_element]
             * ej_i.dot(ref_data.reference_basis_derivatives)
         )
 

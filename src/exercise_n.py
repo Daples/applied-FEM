@@ -59,12 +59,14 @@ xs_matrix = np.zeros((m, q))
 ns_matrix = np.zeros_like(xs_matrix)
 dxns_matrix = np.zeros_like(ns_matrix)
 
-for l in range(mesh.elements.shape[1]):
-    element = mesh.elements[:, l]
-    xs, ns, dxns = eval_func(l, u_coefs, element, param_map, space, ref_data)
-    xs_matrix[l, :] = xs
-    ns_matrix[l, :] = ns
-    dxns_matrix[l, :] = dxns
+for current_element in range(mesh.elements.shape[1]):
+    element = mesh.elements[:, current_element]
+    xs, ns, dxns = eval_func(
+        current_element, u_coefs, element, param_map, space, ref_data
+    )
+    xs_matrix[current_element, :] = xs
+    ns_matrix[current_element, :] = ns
+    dxns_matrix[current_element, :] = dxns
 
 # Plot
 Plotter.plot_results(xs_matrix, ns_matrix, dxns_matrix, "exercise_n.pdf")
