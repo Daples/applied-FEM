@@ -22,7 +22,7 @@ class ReferenceData:
         The evaluation of each reference basis function at the evaluation points. Matrix
         of size `(p+1) x deg`.
     reference_basis_derivatives: numpy.ndarray
-        The derivatives of the matrix above. Matrixof size `(p+1) x deg`.
+        The derivatives of the matrix above. Matrix of size `(p+1) x deg`.
     """
 
     deg: int

@@ -14,7 +14,6 @@ class ParamMap:
         numpy.ndarray | float, numpy.ndarray | float, numpy.ndarray | float
     ] -> numpy.ndarray | float
         The map from the reference element to the actual element.
-
     map_derivatives: numpy.ndarray
         The derivatives of the map on the reference element.
     imap_derivatives: numpy.ndarray
