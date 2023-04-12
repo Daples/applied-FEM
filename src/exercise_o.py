@@ -26,7 +26,7 @@ def problem_L(x: np.ndarray, Nj: np.ndarray, _: np.ndarray) -> np.ndarray:
             fd[z] = 1
         else:
             fd[z] = -1
-    return (np.pi**2) * np.multiply(fd, np.multiply(Nj, np.sin(np.pi * x)))
+    return (np.pi**2) * np.multiply(fd, np.multiply(Nj, np.sin(np.pi**2 * x)))
 
 
 m = 10
