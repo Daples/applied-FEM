@@ -4,6 +4,7 @@ import numpy as np
 from numpy.polynomial.legendre import leggauss as gaussquad
 from scipy.interpolate import _bspl as bspl
 
+from utils import eval_func
 from utils.mesh import Mesh
 from utils.param_map import ParamMap
 from utils.reference_data import ReferenceData
@@ -209,3 +210,118 @@ def assemble_fe_problem(
     A = bar_A[1:-1, 1:-1]
 
     return A, b
+
+
+def assemble_fe_mixed_problem(
+    meshs: list[Mesh],
+    spaces: list[Space],
+    ref_datas: list[ReferenceData],
+    param_maps: list[ParamMap],
+    problem_Bs: list[Callable],
+    problem_Ls: list[Callable],
+    bcs: list[tuple[float, float]],
+) -> tuple[np.ndarray, np.ndarray]:
+    K = len(spaces)
+    for i in range(K):
+        space = spaces[i]
+        mesh = meshs[i]
+        param_map = param_maps[i]
+        ref_data = ref_datas[i]
+        problem_L = problem_Ls[i]
+        problem_B = problem_Bs[i]
+        boundary_conditions = bcs[i]
+
+        n = space.dim
+        bar_A = np.zeros((n, n))
+        bar_b = np.zeros(n)
+
+        for l in range(mesh.elements.shape[1]):
+            element = mesh.elements[:, l]
+
+            xs = param_map.func(ref_data.evaluation_points, element[0], element[1])
+            for i_index, i in enumerate(space.supported_bases[l, :]):
+                ej_i = space.extraction_coefficients[l, i_index, :]
+                ni = ej_i.dot(ref_data.reference_basis)
+                dxni = param_map.imap_derivatives[l] * ej_i.dot(
+                    ref_data.reference_basis_derivatives
+                )
+
+                l_val = problem_L(xs, ni, dxni)
+                val = np.sum(
+                    param_map.map_derivatives[l]
+                    * np.multiply(l_val, ref_data.quadrature_weights)
+                )
+                bar_b[i] += val
+
+                for j_index, j in enumerate(space.supported_bases[l, :]):
+                    ej_i = space.extraction_coefficients[l, j_index, :]
+                    nj = ej_i.dot(ref_data.reference_basis)
+                    dxnj = param_map.imap_derivatives[l] * ej_i.dot(
+                        ref_data.reference_basis_derivatives
+                    )
+                    b_val = problem_B(xs, ni, dxni, nj, dxnj)
+                    val = np.sum(
+                        param_map.map_derivatives[l]
+                        * np.multiply(b_val, ref_data.quadrature_weights)
+                    )
+                    bar_A[i, j] += val
+        b = (
+            bar_b[1:-1]
+            - bar_A[1:-1, 0] * boundary_conditions[0]
+            - bar_A[1:-1, -1] * boundary_conditions[1]
+        )
+        A = bar_A[1:-1, 1:-1]
+
+    return A, b
+
+
+def norm_0(
+    func_u_e: Callable,
+    u_h: np.ndarray,
+    mesh: Mesh,
+    param_map: ParamMap,
+    space: Space,
+    ref_data: ReferenceData,
+) -> float:
+    """"""
+
+    norm = 0
+    for l in range(mesh.elements.shape[1]):
+        element = mesh.elements[:, l]
+        xs, ns, _ = eval_func(l, u_h, element, param_map, space, ref_data)
+
+        u_e = func_u_e(xs)
+        func_eval = (ns - u_e) ** 2
+        norm += np.sum(
+            param_map.map_derivatives[l]
+            * np.multiply(func_eval, ref_data.quadrature_weights)
+        )
+
+    return np.sqrt(norm)
+
+
+def norm_1(
+    func_u_e: Callable,
+    d_func_u_e: Callable,
+    u_h: np.ndarray,
+    mesh: Mesh,
+    param_map: ParamMap,
+    space: Space,
+    ref_data: ReferenceData,
+) -> float:
+    """"""
+
+    norm = 0
+    for l in range(mesh.elements.shape[1]):
+        element = mesh.elements[:, l]
+        xs, ns, dxns = eval_func(l, u_h, element, param_map, space, ref_data)
+
+        u_e = func_u_e(xs)
+        d_u_e = d_func_u_e(xs)
+        func_eval = (ns - u_e) ** 2 + (dxns - d_u_e) ** 2
+        norm += np.sum(
+            param_map.map_derivatives[l]
+            * np.multiply(func_eval, ref_data.quadrature_weights)
+        )
+
+    return np.sqrt(norm)

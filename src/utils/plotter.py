@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Callable
 import os
 
 import matplotlib.pyplot as plt
@@ -19,7 +19,7 @@ class Plotter:
     """
 
     _folder: str = "figs"
-    args: list[Any] = ["-ko"]
+    args: list[Any] = ["-o"]
     kwargs: dict[str, Any] = {"markevery": [0, -1], "markersize": 2}
 
     @staticmethod
@@ -59,6 +59,9 @@ class Plotter:
         dxns_matrix: np.ndarray,
         filename: str,
         result_label: str = "N",
+        x_exact: np.ndarray | None = None,
+        exact_solution: np.ndarray | None = None,
+        d_exact_solution: np.ndarray | None = None,
     ) -> None:
         """It plots the function and derivative evaluation.
 
@@ -84,8 +87,32 @@ class Plotter:
         m = xs_matrix.shape[0]
 
         for l in range(m):
-            axs[0].plot(xs_matrix[l, :], ns_matrix[l, :], *cls.args, **cls.kwargs)
-            axs[1].plot(xs_matrix[l, :], dxns_matrix[l, :], *cls.args, **cls.kwargs)
+            axs[0].plot(
+                xs_matrix[l, :], ns_matrix[l, :], *cls.args, **cls.kwargs, label="$u_h$"
+            )
+            axs[1].plot(
+                xs_matrix[l, :],
+                dxns_matrix[l, :],
+                *cls.args,
+                **cls.kwargs,
+                label="$u_{h,x}$",
+            )
+
+        if exact_solution is not None and d_exact_solution is not None:
+            axs[0].plot(
+                x_exact,
+                exact_solution,
+                *cls.args,
+                **cls.kwargs,
+                label="$u_e$",
+            )
+            axs[1].plot(
+                x_exact,
+                d_exact_solution,
+                *cls.args,
+                **cls.kwargs,
+                label="$u_{e,x}$",
+            )
 
         xlabel = "$x$"
         ylabel = f"${result_label}(x)$"
@@ -97,4 +124,60 @@ class Plotter:
         axs[1].set_xlabel(xlabel)
         axs[1].set_ylabel(ylabel_p)
         axs[1].grid()
+        plt.legend()
         plt.savefig(cls.add_folder(filename), bbox_inches="tight")
+
+    @classmethod
+    def get_plot(
+        cls,
+        x: list[float],
+        y: list[float],
+        path: str,
+        xlabel: str = "$x$",
+        ylabel: str = "$y$",
+    ) -> None:
+        """
+
+        Parameters
+        ----------
+        """
+
+        cls.__clear__()
+        cls.__setup_config__()
+
+        plt.plot(x, y, "k-o", markersize=4)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.grid()
+        plt.savefig(cls.add_folder(path), bbox_inches="tight")
+
+    @classmethod
+    def get_log_plot(
+        cls,
+        x: list[float],
+        y: list[float],
+        path: str,
+        conv_order: Callable,
+        xlabel: str = "$x$",
+        ylabel: str = "$y$",
+    ) -> None:
+        """
+
+        Parameters
+        ----------
+        """
+
+        cls.__clear__()
+        cls.__setup_config__()
+
+        _, ax = plt.subplots(1, 1)
+        ords = [conv_order(i) for i in x]
+        x = [1 / i for i in x]
+        ax.loglog(x, y, label="$||e||$")
+        ax.loglog(x, ords, label="Conv")
+
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.legend()
+        plt.grid()
+        plt.savefig(cls.add_folder(path), bbox_inches="tight")
