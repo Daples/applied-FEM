@@ -217,23 +217,22 @@ def assemble_fe_mixed_problem(
     spaces: list[Space],
     ref_datas: list[ReferenceData],
     param_maps: list[ParamMap],
-    problem_Bs: list[Callable],
+    problem_B_mat: list[list[Callable]],
     problem_Ls: list[Callable],
-    bcs: list[tuple[float, float]],
 ) -> tuple[np.ndarray, np.ndarray]:
     K = len(spaces)
     ns = [space.dim for space in spaces]
     N = sum(ns)
 
-    bar_A = np.zeros((N, N))
-    bar_b = np.zeros(N)
+    A = np.zeros((N, N))
+    b = np.zeros(N)
 
     for l in range(mesh.elements.shape[1]):
         element = mesh.elements[:, l]
 
         accum = 0
-        for space, param_map, ref_data, problem_B, problem_L in zip(
-            spaces, param_maps, ref_datas, problem_Bs, problem_Ls
+        for space, param_map, ref_data, problem_Bs, problem_L in zip(
+            spaces, param_maps, ref_datas, problem_B_mat, problem_Ls
         ):
             n = space.dim
             xs = param_map.func(ref_data.evaluation_points, element[0], element[1])
@@ -249,11 +248,11 @@ def assemble_fe_mixed_problem(
                     param_map.map_derivatives[l]
                     * np.multiply(l_val, ref_data.quadrature_weights)
                 )
-                bar_b[i + accum] += val
+                b[i + accum] += val
 
                 accum_2 = 0
-                for space_2, param_map_2, ref_data_2 in zip(
-                    spaces, param_maps, ref_datas
+                for space_2, param_map_2, ref_data_2, problem_B in zip(
+                    spaces, param_maps, ref_datas, problem_Bs
                 ):
                     n_2 = space_2.dim
                     for j_index, j in enumerate(space_2.supported_bases[l, :]):
@@ -267,15 +266,9 @@ def assemble_fe_mixed_problem(
                             param_map_2.map_derivatives[l]
                             * np.multiply(b_val, ref_data_2.quadrature_weights)
                         )
-                        bar_A[i, j] += val
+                        A[i + accum, j + accum_2] += val
                     accum_2 += n_2
                 accum += n
-    b = (
-        bar_b[1:-1]
-        - bar_A[1:-1, 0] * boundary_conditions[0]
-        - bar_A[1:-1, -1] * boundary_conditions[1]
-    )
-    A = bar_A[1:-1, 1:-1]
 
     return A, b
 
