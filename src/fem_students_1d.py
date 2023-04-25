@@ -268,7 +268,7 @@ def assemble_fe_mixed_problem(
                         )
                         A[i + accum, j + accum_2] += val
                     accum_2 += n_2
-                accum += n
+            accum += n
 
     return A, b
 

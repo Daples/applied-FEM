@@ -50,8 +50,8 @@ problem_Ls = [problem_L1, problem_L2]
 
 # Choice 1
 m = 14
-ps = [1, 1]
-ks = [0, 0]
+ps = [0, 1]
+ks = [-1, 0]
 L = 1
 neval = 3
 spacing_func = lambda i: i * L / m
