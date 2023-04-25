@@ -87,11 +87,10 @@ x_sol = np.linalg.solve(A, b)
 ns = [space.dim for space in spaces]
 accum = 0
 labels = ["sigma", "u"]
-for i in range(len(ns) - 1):
+for i, n in enumerate(ns):
     space = spaces[i]
     ref_data = ref_datas[i]
     param_map = param_maps[i]
-    n = ns[i]
     coefs = x_sol[accum : accum + n]
     accum += n
 
