@@ -213,7 +213,7 @@ def assemble_fe_problem(
 
 
 def assemble_fe_mixed_problem(
-    meshs: list[Mesh],
+    mesh: Mesh,
     spaces: list[Space],
     ref_datas: list[ReferenceData],
     param_maps: list[ParamMap],
@@ -222,22 +222,20 @@ def assemble_fe_mixed_problem(
     bcs: list[tuple[float, float]],
 ) -> tuple[np.ndarray, np.ndarray]:
     K = len(spaces)
-    for i in range(K):
-        space = spaces[i]
-        mesh = meshs[i]
-        param_map = param_maps[i]
-        ref_data = ref_datas[i]
-        problem_L = problem_Ls[i]
-        problem_B = problem_Bs[i]
-        boundary_conditions = bcs[i]
+    ns = [space.dim for space in spaces]
+    N = sum(ns)
 
-        n = space.dim
-        bar_A = np.zeros((n, n))
-        bar_b = np.zeros(n)
+    bar_A = np.zeros((N, N))
+    bar_b = np.zeros(N)
 
-        for l in range(mesh.elements.shape[1]):
-            element = mesh.elements[:, l]
+    for l in range(mesh.elements.shape[1]):
+        element = mesh.elements[:, l]
 
+        accum = 0
+        for space, param_map, ref_data, problem_B, problem_L in zip(
+            spaces, param_maps, ref_datas, problem_Bs, problem_Ls
+        ):
+            n = space.dim
             xs = param_map.func(ref_data.evaluation_points, element[0], element[1])
             for i_index, i in enumerate(space.supported_bases[l, :]):
                 ej_i = space.extraction_coefficients[l, i_index, :]
@@ -251,26 +249,33 @@ def assemble_fe_mixed_problem(
                     param_map.map_derivatives[l]
                     * np.multiply(l_val, ref_data.quadrature_weights)
                 )
-                bar_b[i] += val
+                bar_b[i + accum] += val
 
-                for j_index, j in enumerate(space.supported_bases[l, :]):
-                    ej_i = space.extraction_coefficients[l, j_index, :]
-                    nj = ej_i.dot(ref_data.reference_basis)
-                    dxnj = param_map.imap_derivatives[l] * ej_i.dot(
-                        ref_data.reference_basis_derivatives
-                    )
-                    b_val = problem_B(xs, ni, dxni, nj, dxnj)
-                    val = np.sum(
-                        param_map.map_derivatives[l]
-                        * np.multiply(b_val, ref_data.quadrature_weights)
-                    )
-                    bar_A[i, j] += val
-        b = (
-            bar_b[1:-1]
-            - bar_A[1:-1, 0] * boundary_conditions[0]
-            - bar_A[1:-1, -1] * boundary_conditions[1]
-        )
-        A = bar_A[1:-1, 1:-1]
+                accum_2 = 0
+                for space_2, param_map_2, ref_data_2 in zip(
+                    spaces, param_maps, ref_datas
+                ):
+                    n_2 = space_2.dim
+                    for j_index, j in enumerate(space_2.supported_bases[l, :]):
+                        ej_i = space_2.extraction_coefficients[l, j_index, :]
+                        nj = ej_i.dot(ref_data_2.reference_basis)
+                        dxnj = param_map_2.imap_derivatives[l] * ej_i.dot(
+                            ref_data_2.reference_basis_derivatives
+                        )
+                        b_val = problem_B(xs, ni, dxni, nj, dxnj)
+                        val = np.sum(
+                            param_map_2.map_derivatives[l]
+                            * np.multiply(b_val, ref_data_2.quadrature_weights)
+                        )
+                        bar_A[i, j] += val
+                    accum_2 += n_2
+                accum += n
+    b = (
+        bar_b[1:-1]
+        - bar_A[1:-1, 0] * boundary_conditions[0]
+        - bar_A[1:-1, -1] * boundary_conditions[1]
+    )
+    A = bar_A[1:-1, 1:-1]
 
     return A, b
 
