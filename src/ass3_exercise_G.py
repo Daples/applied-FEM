@@ -59,7 +59,7 @@ problem_Ls = [problem_L1, problem_L2]
 
 # Choice 1
 m = 14
-ps = [2, 1]
+ps = [3, 1]
 ks = [1, 0]
 L = 1
 neval = 3

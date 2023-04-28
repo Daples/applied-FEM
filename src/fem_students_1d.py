@@ -220,7 +220,6 @@ def assemble_fe_mixed_problem(
     problem_B_mat: list[list[Callable]],
     problem_Ls: list[Callable],
 ) -> tuple[np.ndarray, np.ndarray]:
-    K = len(spaces)
     ns = [space.dim for space in spaces]
     N = sum(ns)
 
