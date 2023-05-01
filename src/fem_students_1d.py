@@ -68,7 +68,7 @@ def create_fe_space(deg, reg, mesh) -> Space:
         # first extraction matrix
         C = [np.eye(deg + 1, deg + 1, dtype=float)]
         # this is where knot-insertion coefficients are saved
-        alphas = np.zeros((deg - 1,), dtype=float)
+        alphas = np.zeros((np.maximum(0, deg - 1),), dtype=float)
         while b < m:
             # initialize extraction matrix for next element
             C.append(np.eye(deg + 1, deg + 1))
