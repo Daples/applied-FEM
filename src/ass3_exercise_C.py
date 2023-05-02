@@ -105,4 +105,4 @@ for m in ms:
     norms_1.append(norm_1(u_e, d_u_e, u_coefs, mesh, param_map, space, ref_data))
 
 Plotter.get_log_plot(ms, norms_0, "norm_0_C.pdf", lambda x: 1 / x**3, "$||e||_0$", "$h^3$")
-Plotter.get_log_plot(ms, norms_1, "norm_1_C.pdf", lambda x: 1 / x**2, "$||e||_0$", "$h^2$")
+Plotter.get_log_plot(ms, norms_1, "norm_1_C.pdf", lambda x: 1 / x**2, "$||e||_1$", "$h^2$")

@@ -153,14 +153,40 @@ class Plotter:
         plt.savefig(cls.add_folder(path), bbox_inches="tight")
 
     @classmethod
+    def get_plot(
+        cls,
+        x: list[float],
+        y: list[float],
+        path: str,
+        xlabel: str = "$x$",
+        ylabel: str = "$y$",
+    ) -> None:
+        """
+
+        Parameters
+        ----------
+        """
+
+        cls.__clear__()
+        cls.__setup_config__()
+
+        plt.plot(x, y, "k-o", markersize=4)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.grid()
+        plt.savefig(cls.add_folder(path), bbox_inches="tight")
+
+    @classmethod
     def get_log_plot(
         cls,
         x: list[float],
         y: list[float],
         path: str,
         conv_order: Callable,
-        xlabel: str = "$x$",
-        ylabel: str = "$y$",
+        legend1: str,
+        legend2: str,
+        xlabel: str = "$h$",
+        ylabel: str = "",
     ) -> None:
         """
 
@@ -174,11 +200,12 @@ class Plotter:
         _, ax = plt.subplots(1, 1)
         ords = [conv_order(i) for i in x]
         x = [1 / i for i in x]
-        ax.loglog(x, y, label="$||e||$")
-        ax.loglog(x, ords, label="Conv")
+        ax.loglog(x, y, label= legend1)
+        ax.loglog(x, ords, label= legend2)
 
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         plt.legend()
         plt.grid()
         plt.savefig(cls.add_folder(path), bbox_inches="tight")
+        
