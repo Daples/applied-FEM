@@ -18,7 +18,7 @@ class Plotter:
         The keyword arguments for all plots.
     """
 
-    _folder: str = "/home/daples/git/applied-FEM/src/figs"
+    _folder: str = os.path.join(os.getcwd(), "figs")
     args: list[Any] = ["-o"]
     kwargs: dict[str, Any] = {"markevery": [0, -1], "markersize": 2}
 
