@@ -87,30 +87,31 @@ class Plotter:
         m = xs_matrix.shape[0]
 
         for l in range(m):
-            axs[0].plot(
-                xs_matrix[l, :], ns_matrix[l, :], *cls.args, **cls.kwargs, label="$u_h$"
-            )
-            axs[1].plot(
-                xs_matrix[l, :],
-                dxns_matrix[l, :],
-                *cls.args,
-                **cls.kwargs,
-                label="$u_{h,x}$",
-            )
+            kwargs = cls.kwargs | {"color": "k"}
+            label = {}
+            d_label = {}
+            if l == 0:
+                label = {"label": "$u_h$"}
+                d_label = {"label": "$u_{h,x}$"}
+            kwargs |= label
+            d_kwargs = kwargs | d_label
+            axs[0].plot(xs_matrix[l, :], ns_matrix[l, :], *cls.args, **kwargs)
+            axs[1].plot(xs_matrix[l, :], dxns_matrix[l, :], *cls.args, **d_kwargs)
 
         if exact_solution is not None and d_exact_solution is not None:
+            kwargs = cls.kwargs | {"color": "r"}
             axs[0].plot(
                 x_exact,
                 exact_solution,
                 *cls.args,
-                **cls.kwargs,
+                **kwargs,
                 label="$u_e$",
             )
             axs[1].plot(
                 x_exact,
                 d_exact_solution,
                 *cls.args,
-                **cls.kwargs,
+                **kwargs,
                 label="$u_{e,x}$",
             )
 

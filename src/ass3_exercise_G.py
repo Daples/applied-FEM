@@ -91,7 +91,7 @@ x_sol = np.linalg.solve(A, b)
 
 ns = [space.dim for space in spaces]
 accum = 0
-labels = ["sigma", "u"]
+labels = ["\\sigma", "u"]
 for i, n in enumerate(ns):
     space = spaces[i]
     ref_data = refined_ref_datas[i]
@@ -119,6 +119,7 @@ for i, n in enumerate(ns):
     x_exact = np.linspace(0, L, m * q)
     exact = fs[i](x_exact)
     d_exact = dfs[i](x_exact)
+    name = labels[i].replace("\\", "")
     Plotter.plot_results(
         xs_matrix,
         ns_matrix,
