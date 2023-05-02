@@ -118,5 +118,5 @@ print(const0)
 const1 = np.mean(const1)
 print(const1)
 
-Plotter.get_log_plot(ms, norms_0, "norm_0_C.pdf", lambda x: const0 * 1 / x**3, "$||e||_0$", "$h^3$")
-Plotter.get_log_plot(ms, norms_1, "norm_1_C.pdf", lambda x: const1 * 1 / x**2, "$||e||_1$", "$h^2$")
+Plotter.get_log_plot(ms, norms_0, "norm_0_C.pdf", lambda x: const0 * 1 / x**3, "$||e||_0$", "$C_0 \cdot h^3$")
+Plotter.get_log_plot(ms, norms_1, "norm_1_C.pdf", lambda x: const1 * 1 / x**2, "$||e||_1$", "$C_1 \cdot h^2$")
