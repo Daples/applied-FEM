@@ -201,11 +201,10 @@ class Plotter:
         ords = [conv_order(i) for i in x]
         x = [1 / i for i in x]
         ax.loglog(x, y, label= legend1)
-        ax.loglog(x, ords, label= legend2)
+        ax.loglog(x, ords, "--*", label= legend2)
 
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         plt.legend()
         plt.grid()
         plt.savefig(cls.add_folder(path), bbox_inches="tight")
-        
