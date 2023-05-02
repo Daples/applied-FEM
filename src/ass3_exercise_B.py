@@ -6,6 +6,8 @@ from fem_students_1d import (
     create_mesh,
     create_param_map,
     create_ref_data,
+    norm_0,
+    norm_1,
 )
 from utils import eval_func
 from utils.plotter import Plotter
@@ -81,3 +83,6 @@ Plotter.plot_results(
     exact_solution=exact,
     d_exact_solution=d_exact,
 )
+
+print(norm_0(u_e, u_coefs, mesh, param_map, space, ref_data))
+print(norm_1(u_e, d_u_e, u_coefs, mesh, param_map, space, ref_data))
