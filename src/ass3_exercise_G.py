@@ -67,6 +67,7 @@ spacing_func = lambda i: i * L / m
 
 spaces = []
 ref_datas = []
+refined_ref_datas = []
 param_maps = []
 brk = np.array([spacing_func(i) for i in range(0, m + 1)])
 mesh = create_mesh(brk)
@@ -79,6 +80,10 @@ for i, p in enumerate(ps):
     ref_datas.append(ref_data)
     param_maps.append(param_map)
 
+    # Refined
+    neval_refined = 20
+    refined_ref_datas.append(create_ref_data(neval_refined, p, True))
+
 A, b = assemble_fe_mixed_problem(
     mesh, spaces, ref_datas, param_maps, problem_B_mat, problem_Ls
 )
@@ -89,7 +94,7 @@ accum = 0
 labels = ["sigma", "u"]
 for i, n in enumerate(ns):
     space = spaces[i]
-    ref_data = ref_datas[i]
+    ref_data = refined_ref_datas[i]
     param_map = param_maps[i]
     coefs = x_sol[accum : accum + n]
     accum += n
