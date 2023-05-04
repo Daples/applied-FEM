@@ -1,3 +1,4 @@
+from typing import cast
 import numpy as np
 
 from fem_students_1d import (
@@ -110,8 +111,8 @@ conv_h1 = [1 / i**2 for i in ms]
 const0 = [i / j for i, j in zip(norms_0, conv_h0)]
 const1 = [i / j for i, j in zip(norms_1, conv_h1)]
 
-const0 = np.mean(const0)
-const1 = np.mean(const1)
+const0 = cast(float, np.mean(const0))
+const1 = cast(float, np.mean(const1))
 
 Plotter.get_log_plot(
     ms,
