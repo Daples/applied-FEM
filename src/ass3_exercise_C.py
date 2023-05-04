@@ -104,14 +104,28 @@ for m in ms:
     norms_0.append(norm_0(u_e, u_coefs, mesh, param_map, space, ref_data))
     norms_1.append(norm_1(u_e, d_u_e, u_coefs, mesh, param_map, space, ref_data))
 
-conv_h0 = [ 1 / i ** 3 for i in ms]
-conv_h1 = [ 1 / i ** 2 for i in ms]
+conv_h0 = [1 / i**3 for i in ms]
+conv_h1 = [1 / i**2 for i in ms]
 
-const0 = [i / j for i,j in zip(norms_0,conv_h0)]
-const1 = [i / j for i,j in zip(norms_1,conv_h1)]
+const0 = [i / j for i, j in zip(norms_0, conv_h0)]
+const1 = [i / j for i, j in zip(norms_1, conv_h1)]
 
 const0 = np.mean(const0)
 const1 = np.mean(const1)
 
-Plotter.get_log_plot(ms, norms_0, "norm_0_C.pdf", lambda x: const0 * 1 / x**3, "$||e||_0$", "$C_0 \cdot h^3$")
-Plotter.get_log_plot(ms, norms_1, "norm_1_C.pdf", lambda x: const1 * 1 / x**2, "$||e||_1$", "$C_1 \cdot h^2$")
+Plotter.get_log_plot(
+    ms,
+    norms_0,
+    "norm_0_C.pdf",
+    lambda x: const0 * 1 / x**3,
+    "$||e||_0$",
+    "$C_0 \cdot h^3$",
+)
+Plotter.get_log_plot(
+    ms,
+    norms_1,
+    "norm_1_C.pdf",
+    lambda x: const1 * 1 / x**2,
+    "$||e||_1$",
+    "$C_1 \cdot h^2$",
+)
