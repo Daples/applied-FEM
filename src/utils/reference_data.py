@@ -7,7 +7,6 @@ import numpy as np
 class ReferenceData:
     """A data class to store the reference data.
 
-
     Attributes
     ----------
     deg: int
