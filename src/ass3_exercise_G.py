@@ -12,7 +12,6 @@ from fem_students_1d import (
 from utils import eval_func
 from utils.plotter import Plotter
 
-
 # Exact solutions
 u_e = lambda x: np.cos(np.pi * (x - 0.5))
 d_u_e = lambda x: -np.pi * np.sin(np.pi * (x - 0.5))

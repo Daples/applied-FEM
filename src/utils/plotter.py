@@ -1,5 +1,5 @@
-from typing import Any, Callable
 import os
+from typing import Any, Callable
 
 import matplotlib.pyplot as plt
 

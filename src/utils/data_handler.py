@@ -1,7 +1,8 @@
 from typing import Callable
-from utils._typing import DataArray
 
 import numpy as np
+
+from utils._typing import DataArray
 
 
 class DataHandler:
