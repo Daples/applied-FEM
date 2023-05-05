@@ -2,9 +2,9 @@ from typing import cast
 
 import numpy as np
 
-from utils.param_map import ParamMap
-from utils.reference_data import ReferenceData
-from utils.space import Space
+from fem.param_map import ParamMap
+from fem.reference_data import ReferenceData
+from fem.space import Space
 
 
 def eval_func(

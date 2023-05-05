@@ -3,15 +3,15 @@ import numpy as np
 
 from fem_students_1d import (
     assemble_fe_problem,
-    create_fe_space,
-    create_mesh,
-    create_param_map,
-    create_ref_data,
     norm_0,
     norm_1,
 )
 from utils import eval_func
 from utils.plotter import Plotter
+from fem.mesh import Mesh
+from fem.param_map import ParamMap
+from fem.reference_data import ReferenceData
+from fem.space import Space
 
 
 def problem_B(
@@ -50,10 +50,10 @@ norms_0 = []
 norms_1 = []
 for m in ms:
     brk = np.array([spacing_func(i) for i in range(0, m + 1)])
-    mesh = create_mesh(brk)
-    param_map = create_param_map(mesh)
-    space = create_fe_space(p, k, mesh)
-    ref_data = create_ref_data(neval, p, True)
+    mesh = Mesh(brk)
+    param_map = ParamMap(mesh)
+    space = Space(p, k, mesh)
+    ref_data = ReferenceData(neval, p, True)
 
     A, b = assemble_fe_problem(
         mesh, space, ref_data, param_map, problem_B, problem_L, bc
@@ -68,7 +68,7 @@ for m in ms:
 
     # Increase point evaluations for better resolution
     neval = 20
-    ref_data = create_ref_data(neval, p, True)
+    ref_data = ReferenceData(neval, p, True)
 
     # Recover solution
     m = mesh.elements.shape[1]

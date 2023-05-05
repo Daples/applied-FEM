@@ -3,12 +3,10 @@ from typing import Callable
 import matplotlib.pyplot as plt
 import numpy as np
 
-from fem_students_1d import (
-    create_fe_space,
-    create_mesh,
-    create_param_map,
-    create_ref_data,
-)
+from fem.mesh import Mesh
+from fem.param_map import ParamMap
+from fem.reference_data import ReferenceData
+from fem.space import Space
 from utils import eval_func
 from utils.plotter import Plotter
 
@@ -45,10 +43,10 @@ class Tests:
         Plotter.__setup_config__()
 
         brk = np.array([spacing_func(i) for i in range(0, m + 1)])
-        mesh = create_mesh(brk)
-        param_map = create_param_map(mesh)
-        space = create_fe_space(p, k, mesh)
-        ref_data = create_ref_data(neval, p, False)
+        mesh = Mesh(brk)
+        param_map = ParamMap(mesh)
+        space = Space(p, k, mesh)
+        ref_data = ReferenceData(neval, p, False)
 
         n = space.dim
 

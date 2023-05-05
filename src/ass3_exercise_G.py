@@ -2,15 +2,13 @@ import numpy as np
 
 from fem_students_1d import (
     assemble_fe_mixed_problem,
-    create_fe_space,
-    create_mesh,
-    create_param_map,
-    create_ref_data,
-    norm_0,
-    norm_1,
 )
 from utils import eval_func
 from utils.plotter import Plotter
+from fem.mesh import Mesh
+from fem.param_map import ParamMap
+from fem.reference_data import ReferenceData
+from fem.space import Space
 
 # Exact solutions
 u_e = lambda x: np.cos(np.pi * (x - 0.5))
@@ -69,19 +67,20 @@ ref_datas = []
 refined_ref_datas = []
 param_maps = []
 brk = np.array([spacing_func(i) for i in range(0, m + 1)])
-mesh = create_mesh(brk)
+mesh = Mesh(brk)
+param_map = ParamMap(mesh)
+
 for i, p in enumerate(ps):
     k = ks[i]
-    param_map = create_param_map(mesh)
-    space = create_fe_space(p, k, mesh)
-    ref_data = create_ref_data(neval, p, True)
+    space = Space(p, k, mesh)
+    ref_data = ReferenceData(neval, p, True)
     spaces.append(space)
     ref_datas.append(ref_data)
     param_maps.append(param_map)
 
     # Refined
     neval_refined = 20
-    refined_ref_datas.append(create_ref_data(neval_refined, p, True))
+    refined_ref_datas.append(ReferenceData(neval_refined, p, True))
 
 A, b = assemble_fe_mixed_problem(
     mesh, spaces, ref_datas, param_maps, problem_B_mat, problem_Ls

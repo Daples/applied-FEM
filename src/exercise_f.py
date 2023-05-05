@@ -1,13 +1,11 @@
 import numpy as np
 
-from fem_students_1d import (
-    create_fe_space,
-    create_mesh,
-    create_param_map,
-    create_ref_data,
-)
 from utils import eval_func
 from utils.plotter import Plotter
+from fem.mesh import Mesh
+from fem.param_map import ParamMap
+from fem.reference_data import ReferenceData
+from fem.space import Space
 
 coefs = np.loadtxt("data/coefficients.txt")
 
@@ -19,10 +17,10 @@ neval = 20
 spacing_func = lambda i: i**2 * L / m**2
 
 brk = np.array([spacing_func(i) for i in range(0, m + 1)])
-mesh = create_mesh(brk)
-param_map = create_param_map(mesh)
-space = create_fe_space(p, k, mesh)
-ref_data = create_ref_data(neval, p, False)
+mesh = Mesh(brk)
+param_map = ParamMap(mesh)
+space = Space(p, k, mesh)
+ref_data = ReferenceData(neval, p, False)
 
 m = mesh.elements.shape[1]
 q = ref_data.evaluation_points.shape[0]
