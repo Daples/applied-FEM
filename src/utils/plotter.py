@@ -53,6 +53,9 @@ class Plotter:
             The path with the added folder.
         """
 
+        if not os.path.exists(cls._folder):
+            os.mkdir(cls._folder)
+
         return os.path.join(cls._folder, path)
 
     @classmethod
