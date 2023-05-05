@@ -1,12 +1,10 @@
 import numpy as np
 
-from fem_students_1d import (
-    assemble_fe_problem,
-)
 from fem.mesh import Mesh
 from fem.param_map import ParamMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
+from fem_students_1d import assemble_fe_problem
 
 
 def problem_B(

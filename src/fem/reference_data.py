@@ -1,5 +1,4 @@
 import numpy as np
-
 from numpy.polynomial.legendre import leggauss as gaussquad
 from scipy.interpolate import _bspl as bspl
 

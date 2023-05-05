@@ -1,11 +1,11 @@
 import numpy as np
 
-from utils import eval_func
-from utils.plotter import Plotter
 from fem.mesh import Mesh
 from fem.param_map import ParamMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
+from utils import eval_func
+from utils.plotter import Plotter
 
 coefs = np.loadtxt("data/coefficients.txt")
 

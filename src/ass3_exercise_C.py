@@ -1,17 +1,14 @@
 from typing import cast
+
 import numpy as np
 
-from fem_students_1d import (
-    assemble_fe_problem,
-    norm_0,
-    norm_1,
-)
-from utils import eval_func
-from utils.plotter import Plotter
 from fem.mesh import Mesh
 from fem.param_map import ParamMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
+from fem_students_1d import assemble_fe_problem, norm_0, norm_1
+from utils import eval_func
+from utils.plotter import Plotter
 
 
 def problem_B(

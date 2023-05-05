@@ -2,11 +2,11 @@ from typing import Callable
 
 import numpy as np
 
-from utils import eval_func
 from fem.mesh import Mesh
 from fem.param_map import ParamMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
+from utils import eval_func
 
 
 def assemble_fe_problem(
