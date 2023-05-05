@@ -30,4 +30,4 @@ class Mesh:
         elements = np.zeros((2, self.m))
         elements[0, :] = brk[:-1]
         elements[1, :] = brk[1:]
-        self.elements = brk
+        self.elements = elements
