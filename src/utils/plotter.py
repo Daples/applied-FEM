@@ -228,8 +228,8 @@ class Plotter:
         _, ax = plt.subplots(1, 1)
         ords = [conv_order(i) for i in x]
         x = [1 / i for i in x]
-        ax.loglog(x, y, label=legend1)
-        ax.loglog(x, ords, "--*", label=legend2)
+        ax.loglog(x, y, "r", label=legend1)
+        ax.loglog(x, ords, "--*k", label=legend2)
 
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
