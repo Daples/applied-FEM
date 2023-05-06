@@ -1,5 +1,4 @@
 from typing import Callable
-from utils._typing import BilinearForm, LinearForm
 
 import numpy as np
 
@@ -7,6 +6,7 @@ from fem.mesh import Mesh
 from fem.param_map import ParametricMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
+from utils._typing import BilinearForm, LinearForm
 
 
 class Assembler:

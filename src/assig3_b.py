@@ -1,14 +1,13 @@
 import numpy as np
 
+from fem.assembler import Assembler
 from fem.mesh import Mesh
+from fem.norms import h0_norm, h1_norm
 from fem.param_map import ParametricMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
-from fem.assembler import Assembler
-from fem.norms import h0_norm, h1_norm
 from utils import eval_func
 from utils.plotter import Plotter
-
 
 problem_B = lambda x, Nj, dNj, Nk, dNk: np.multiply(dNj, dNk)
 problem_L = lambda x, Nj, dNj: -2 * np.pi * Nj

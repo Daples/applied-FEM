@@ -1,5 +1,4 @@
 from typing import Callable
-from utils._typing import FormData
 
 import numpy as np
 
@@ -8,6 +7,7 @@ from fem.param_map import ParametricMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
 from utils import eval_func
+from utils._typing import FormData
 
 
 def h0_norm(

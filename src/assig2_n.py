@@ -1,13 +1,12 @@
 import numpy as np
 
+from fem.assembler import Assembler
 from fem.mesh import Mesh
 from fem.param_map import ParametricMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
-from fem.assembler import Assembler
 from utils import eval_func
 from utils.plotter import Plotter
-
 
 problem_B = lambda x, Nj, dNj, Nk, dNk: np.multiply(dNj, dNk)
 problem_L = lambda x, Nj, dNj: (np.pi**2) * np.multiply(Nj, np.sin(np.pi * x))
