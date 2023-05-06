@@ -40,6 +40,13 @@ class Assembler:
             The linear form in the weak formulation.
         bc: tuple[float, float]
             The boundary conditions.
+
+        Returns
+        -------
+        numpy.ndarray
+            The left-hand side linear system matrix.
+        numpy.ndarray
+            The right-hand side linear system vector.
         """
 
         n = space.dim
@@ -106,6 +113,13 @@ class Assembler:
             The matrix of bilinear forms in the weak formulation.
         problem_Ls: utils._typing.LinearForm
             The list of linear forms in the weak formulation.
+
+        Returns
+        -------
+        numpy.ndarray
+            The left-hand side linear system matrix.
+        numpy.ndarray
+            The right-hand side linear system vector.
         """
 
         ns = [space.dim for space in spaces]
