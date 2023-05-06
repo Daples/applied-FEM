@@ -1,10 +1,10 @@
 import numpy as np
 
 from fem.mesh import Mesh
-from fem.param_map import ParamMap
+from fem.param_map import ParametricMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
-from fem_students_1d import assemble_fe_mixed_problem
+from fem.assembler import Assembler
 from utils import eval_func
 from utils.plotter import Plotter
 
@@ -17,36 +17,13 @@ fs = [sigma, u_e]
 dfs = [d_sigma, d_u_e]
 
 
-def problem_B11(
-    x: np.ndarray, Nj: np.ndarray, _: np.ndarray, Nk: np.ndarray, dNk: np.ndarray
-) -> np.ndarray:
-    return np.multiply(Nj, Nk)
+problem_B11 = lambda x, Nj, dNj, Nk, dNk: np.multiply(Nj, Nk)
+problem_B12 = lambda x, Nj, dNj, Nk, dNk: -np.multiply(dNj, Nk)
+problem_B21 = lambda x, Nj, dNj, Nk, dNk: np.multiply(Nj, dNk)
+problem_B22 = lambda x, Nj, dNj, Nk, dNk: np.zeros_like(Nj)
 
-
-def problem_B12(
-    x: np.ndarray, Nj: np.ndarray, dNj: np.ndarray, Nk: np.ndarray, dNk: np.ndarray
-) -> np.ndarray:
-    return -np.multiply(dNj, Nk)
-
-
-def problem_B21(
-    x: np.ndarray, Nj: np.ndarray, dNj: np.ndarray, Nk: np.ndarray, dNk: np.ndarray
-) -> np.ndarray:
-    return np.multiply(Nj, dNk)
-
-
-def problem_B22(
-    x: np.ndarray, Nj: np.ndarray, dNj: np.ndarray, Nk: np.ndarray, dNk: np.ndarray
-) -> np.ndarray:
-    return np.zeros_like(Nj)
-
-
-def problem_L1(x: np.ndarray, Nj: np.ndarray, __: np.ndarray) -> np.ndarray:
-    return np.zeros_like(Nj)
-
-
-def problem_L2(x: np.ndarray, Nj: np.ndarray, Nk: np.ndarray) -> np.ndarray:
-    return np.pi**2 * np.multiply(np.cos(np.pi * (x - 0.5)), Nj)
+problem_L1 = lambda x, Nj, dNj: np.zeros_like(Nj)
+problem_L2 = lambda x, Nj, dNj: np.pi**2 * np.multiply(np.cos(np.pi * (x - 0.5)), Nj)
 
 
 problem_B_mat = [[problem_B11, problem_B12], [problem_B21, problem_B22]]
@@ -66,7 +43,7 @@ refined_ref_datas = []
 param_maps = []
 brk = np.array([spacing_func(i) for i in range(0, m + 1)])
 mesh = Mesh(brk)
-param_map = ParamMap(mesh)
+param_map = ParametricMap(mesh)
 
 for i, p in enumerate(ps):
     k = ks[i]
@@ -80,7 +57,7 @@ for i, p in enumerate(ps):
     neval_refined = 20
     refined_ref_datas.append(ReferenceData(neval_refined, p, True))
 
-A, b = assemble_fe_mixed_problem(
+A, b = Assembler.mixed_one_dimensional(
     mesh, spaces, ref_datas, param_maps, problem_B_mat, problem_Ls
 )
 x_sol = np.linalg.solve(A, b)

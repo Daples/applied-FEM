@@ -1,20 +1,17 @@
 import numpy as np
 
 from fem.mesh import Mesh
-from fem.param_map import ParamMap
+from fem.param_map import ParametricMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
-from fem_students_1d import assemble_fe_problem
+from fem.assembler import Assembler
 from utils import eval_func
 from utils.plotter import Plotter
 
 
-def problem_B(
-    x: np.ndarray, Nj: np.ndarray, dNj: np.ndarray, Nk: np.ndarray, dNk: np.ndarray
-) -> np.ndarray:
-    return np.multiply(
-        1 - 0.4 * np.cos(np.pi * x), np.multiply(dNj, dNk)
-    ) + np.multiply(Nj, Nk)
+problem_B = lambda x, Nj, dNj, Nk, dNk: np.multiply(
+    1 - 0.4 * np.cos(np.pi * x), np.multiply(dNj, dNk)
+) + np.multiply(Nj, Nk)
 
 
 def problem_L(x: np.ndarray, Nj: np.ndarray, _: np.ndarray) -> np.ndarray:
@@ -38,11 +35,13 @@ bc = (0.0, 1.0)
 # Initialize problem and assemble matrices
 brk = np.array([spacing_func(i) for i in range(0, m + 1)])
 mesh = Mesh(brk)
-param_map = ParamMap(mesh)
+param_map = ParametricMap(mesh)
 space = Space(p, k, mesh)
 ref_data = ReferenceData(neval, p, True)
 
-A, b = assemble_fe_problem(mesh, space, ref_data, param_map, problem_B, problem_L, bc)
+A, b = Assembler.one_dimensional(
+    mesh, space, ref_data, param_map, problem_B, problem_L, bc  # type: ignore
+)
 
 # Save system matrices
 np.savetxt("1/A.txt", A, delimiter=",", fmt="%1.14f")

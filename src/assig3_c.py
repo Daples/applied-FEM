@@ -3,30 +3,27 @@ from typing import cast
 import numpy as np
 
 from fem.mesh import Mesh
-from fem.param_map import ParamMap
+from fem.param_map import ParametricMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
-from fem_students_1d import assemble_fe_problem, norm_0, norm_1
+from fem.assembler import Assembler
+from fem_students_1d import norm_0, norm_1
 from utils import eval_func
 from utils.plotter import Plotter
 
 
-def problem_B(
-    _: np.ndarray, __: np.ndarray, dNj: np.ndarray, ___: np.ndarray, dNk: np.ndarray
-) -> np.ndarray:
-    return np.multiply(dNj, dNk)
-
-
-def problem_L(x: np.ndarray, Nj: np.ndarray, __: np.ndarray) -> np.ndarray:
-    return (
+problem_B = lambda x, Nj, dNj, Nk, dNk: np.multiply(dNj, dNk)
+problem_L = (
+    lambda x, Nj, dNj: (
         4
         * np.exp(-6 * np.power(x, 2))
         * (
             (-36 * x**2 + 4 * np.pi**2 + 3) * np.sin(4 * np.pi * x)
             + 24 * np.pi * x * np.cos(4 * np.pi * x)
         )
-    ) * Nj
-
+    )
+    * Nj
+)
 
 u_e = lambda x: np.exp(-6 * x**2) * np.sin(4 * np.pi * x)
 d_u_e = (
@@ -48,11 +45,11 @@ norms_1 = []
 for m in ms:
     brk = np.array([spacing_func(i) for i in range(0, m + 1)])
     mesh = Mesh(brk)
-    param_map = ParamMap(mesh)
+    param_map = ParametricMap(mesh)
     space = Space(p, k, mesh)
     ref_data = ReferenceData(neval, p, True)
 
-    A, b = assemble_fe_problem(
+    A, b = Assembler.one_dimensional(
         mesh, space, ref_data, param_map, problem_B, problem_L, bc
     )
 

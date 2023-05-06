@@ -1,22 +1,17 @@
 import numpy as np
 
 from fem.mesh import Mesh
-from fem.param_map import ParamMap
+from fem.param_map import ParametricMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
-from fem_students_1d import assemble_fe_problem, norm_0, norm_1
+from fem_students_1d import norm_0, norm_1
+from fem.assembler import Assembler
 from utils import eval_func
 from utils.plotter import Plotter
 
 
-def problem_B(
-    _: np.ndarray, __: np.ndarray, dNj: np.ndarray, ___: np.ndarray, dNk: np.ndarray
-) -> np.ndarray:
-    return np.multiply(dNj, dNk)
-
-
-def problem_L(_: np.ndarray, Nj: np.ndarray, __: np.ndarray) -> np.ndarray:
-    return -2 * np.pi * Nj
+problem_B = lambda x, Nj, dNj, Nk, dNk: np.multiply(dNj, dNk)
+problem_L = lambda x, Nj, dNj: -2 * np.pi * Nj
 
 
 u_e = lambda x: np.pi * np.power(x, 2) - np.e * x + 1
@@ -32,11 +27,13 @@ bc = (1, np.pi - np.e + 1)
 
 brk = np.array([spacing_func(i) for i in range(0, m + 1)])
 mesh = Mesh(brk)
-param_map = ParamMap(mesh)
+param_map = ParametricMap(mesh)
 space = Space(p, k, mesh)
 ref_data = ReferenceData(neval, p, True)
 
-A, b = assemble_fe_problem(mesh, space, ref_data, param_map, problem_B, problem_L, bc)
+A, b = Assembler.one_dimensional(
+    mesh, space, ref_data, param_map, problem_B, problem_L, bc
+)
 
 # Solve linear system
 u_sol = np.linalg.solve(A, b)

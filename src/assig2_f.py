@@ -1,7 +1,7 @@
 import numpy as np
 
 from fem.mesh import Mesh
-from fem.param_map import ParamMap
+from fem.param_map import ParametricMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
 from utils import eval_func
@@ -18,7 +18,7 @@ spacing_func = lambda i: i**2 * L / m**2
 
 brk = np.array([spacing_func(i) for i in range(0, m + 1)])
 mesh = Mesh(brk)
-param_map = ParamMap(mesh)
+param_map = ParametricMap(mesh)
 space = Space(p, k, mesh)
 ref_data = ReferenceData(neval, p, False)
 
