@@ -7,7 +7,7 @@ from fem.param_map import ParametricMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
 from fem.assembler import Assembler
-from fem_students_1d import norm_0, norm_1
+from fem.norms import h0_norm, h1_norm
 from utils import eval_func
 from utils.plotter import Plotter
 
@@ -96,8 +96,8 @@ for m in ms:
     )
 
     # Save norms
-    norms_0.append(norm_0(u_e, u_coefs, mesh, param_map, space, ref_data))
-    norms_1.append(norm_1(u_e, d_u_e, u_coefs, mesh, param_map, space, ref_data))
+    norms_0.append(h0_norm(u_e, u_coefs, mesh, param_map, space, ref_data))
+    norms_1.append(h1_norm(u_e, d_u_e, u_coefs, mesh, param_map, space, ref_data))
 
 conv_h0 = [1 / i**3 for i in ms]
 conv_h1 = [1 / i**2 for i in ms]

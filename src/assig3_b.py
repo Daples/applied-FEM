@@ -4,8 +4,8 @@ from fem.mesh import Mesh
 from fem.param_map import ParametricMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
-from fem_students_1d import norm_0, norm_1
 from fem.assembler import Assembler
+from fem.norms import h0_norm, h1_norm
 from utils import eval_func
 from utils.plotter import Plotter
 
@@ -77,5 +77,5 @@ Plotter.plot_results(
     d_exact_solution=d_exact,
 )
 
-print(norm_0(u_e, u_coefs, mesh, param_map, space, ref_data))
-print(norm_1(u_e, d_u_e, u_coefs, mesh, param_map, space, ref_data))
+print(h0_norm(u_e, u_coefs, mesh, param_map, space, ref_data))
+print(h1_norm(u_e, d_u_e, u_coefs, mesh, param_map, space, ref_data))
