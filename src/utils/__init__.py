@@ -2,7 +2,7 @@ from typing import cast
 
 import numpy as np
 
-from fem.param_map import ParamMap
+from fem.param_map import ParametricMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
 
@@ -11,7 +11,7 @@ def eval_func(
     current_element: int,
     coefs: np.ndarray,
     element: np.ndarray,
-    param_map: ParamMap,
+    param_map: ParametricMap,
     space: Space,
     ref_data: ReferenceData,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -26,7 +26,7 @@ def eval_func(
         The coefficients of the basis functions for the current element.
     element: numpy.ndarray
         The current element.
-    param_map: utils.param_map.ParamMap
+    param_map: utils.param_map.ParametricMap
         The parametric map object.
     space: utils.space.Space
         The finite element space object.

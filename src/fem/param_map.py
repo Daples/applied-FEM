@@ -5,8 +5,9 @@ import numpy as np
 from fem.mesh import Mesh
 
 
-class ParamMap:
-    """A data class to represent a parametric map.
+class ParametricMap:
+    """A data class to represent the parametric map between the reference and real
+    elements.
 
     Attributes
     ----------
