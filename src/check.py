@@ -35,6 +35,13 @@ n = fe_space.n
 coefs = np.zeros((n))
 coefs[6] = 1
 
+x, y = np.meshgrid(np.linspace(0,1,3),np.linspace(0,1,3))
+
+
+plot_grid_x = np.zeros((3,3))
+plot_grid_y = np.zeros((3,3))
+plot_grid_u = np.zeros((3,3))
+
 for current_element in range(fe_geometry.m):
     support_extractors = fe_space.support_extractors[current_element]
     print(eval_func(ref_data, support_extractors, geom_map, current_element, coefs, 9))
