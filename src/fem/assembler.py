@@ -183,7 +183,7 @@ class Assembler:
         fe_geometry,
         problem_B: BilinearForm_2D,
         problem_L: LinearForm_2D
-    ) -> tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray, list[int]]:
 
         n = fe_space.n
         bar_A = np.zeros((n, n))
@@ -243,9 +243,10 @@ class Assembler:
         
         idxs = set(fe_space.boundary_bases.squeeze().tolist())
         all_idxs = set(range(bar_A.shape[0]))
-        idxs = all_idxs.difference(idxs)
+        idxs = list(all_idxs.difference(idxs))
 
-        A = bar_A[idxs, idxs]
+        A = bar_A[idxs, :]
+        A = A[:, idxs]
         b = bar_b[idxs]
 
-        return A, b
+        return A, b, idxs
