@@ -1,5 +1,3 @@
-from typing import Callable
-
 import numpy as np
 
 from utils._typing import DataArray
@@ -8,11 +6,9 @@ from utils._typing import DataArray
 class DataHandler:
     """A class to homogenize the management and typing of data."""
 
-    array_type: Callable[[DataArray], np.ndarray]
-
     @classmethod
     def __cast_array__(cls, *args: DataArray) -> tuple[np.ndarray, ...]:
-        """It converts the input array types into the standardize  type.
+        """It converts the input array types into the standardized type.
 
         Parameters
         ----------
@@ -21,8 +17,8 @@ class DataHandler:
 
         Returns
         -------
-        tuple[utils._typing.DataArrray]
-            The transformed types.
+        tuple[utils._typing.DataArrray, ...]
+            The transformed arrays.
         """
 
         return tuple(map(lambda x: np.array(x), args))
