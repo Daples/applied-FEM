@@ -46,7 +46,7 @@ plt.figure()
 
 for current_element in range(fe_geometry.m):
     support_extractors = fe_space.support_extractors[current_element]
-    u, _, _ = eval_func(ref_data, support_extractors, geom_map, current_element, coefs, 20 ** 2)
+    u, dx, dy= eval_func(ref_data, support_extractors, geom_map, current_element, coefs, 20 ** 2)
     x = geom_map.map[:,0,current_element]
     y = geom_map.map[:,1,current_element]
 
@@ -55,7 +55,7 @@ for current_element in range(fe_geometry.m):
             I = j * 20 + i
             plot_grid_x[i, j] = x[I]
             plot_grid_y[i, j] = y[I]
-            plot_grid_u[i, j] = u[0,I]
+            plot_grid_u[i, j] = dy[0,I]
 
 
     plt.contourf(plot_grid_x, plot_grid_y, plot_grid_u, cmap ='viridis')
