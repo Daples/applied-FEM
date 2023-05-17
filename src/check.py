@@ -20,7 +20,7 @@ def eval_func(ref_data, support_extractors, geom_map, current_element, coefs, n)
         )
         dyns += (
             coefs[j]
-            * ej_i.dot(np.multiply(geom_map.imap_derivatives[:,1,current_element], ref_data.reference_basis_derivatives[:,:,0])
+            * ej_i.dot(np.multiply(geom_map.imap_derivatives[:,2,current_element], ref_data.reference_basis_derivatives[:,:,0])
                        +np.multiply(geom_map.imap_derivatives[:,3,current_element], ref_data.reference_basis_derivatives[:,:,1]))
         )
 
@@ -29,40 +29,41 @@ def eval_func(ref_data, support_extractors, geom_map, current_element, coefs, n)
 
 fe_geometry, fe_space = read_mat("data/star3.mat")
 
-ref_data = create_ref_data(3, [2, 2], True)
+ref_data = create_ref_data(20, [2, 2], False)
 geom_map = create_geometric_map(fe_geometry, ref_data)
 
 n = fe_space.n
 coefs = np.zeros((n))
-coefs[6] = 1
+coefs[4] = 1
 
 x, y = np.meshgrid(np.linspace(0,1,3),np.linspace(0,1,3))
 
 
-plot_grid_x = np.zeros((3,3))
-plot_grid_y = np.zeros((3,3))
-plot_grid_u = np.zeros((3,3))
+plot_grid_x = np.zeros((20,20))
+plot_grid_y = np.zeros((20,20))
+plot_grid_u = np.zeros((20,20))
+plt.figure()
 
 for current_element in range(fe_geometry.m):
     support_extractors = fe_space.support_extractors[current_element]
-    u, _, _ = eval_func(ref_data, support_extractors, geom_map, current_element, coefs, 9)
+    u, _, _ = eval_func(ref_data, support_extractors, geom_map, current_element, coefs, 20 ** 2)
     x = geom_map.map[:,0,current_element]
     y = geom_map.map[:,1,current_element]
 
-    for i in range(3):
-        for j in range(3):
-            I = j * 3 + i
+    for i in range(20):
+        for j in range(20):
+            I = j * 20 + i
             plot_grid_x[i, j] = x[I]
             plot_grid_y[i, j] = y[I]
             plot_grid_u[i, j] = u[0,I]
 
-    plt.figure()
+
     plt.contourf(plot_grid_x, plot_grid_y, plot_grid_u, cmap ='viridis')
     plt.title('Heatmap of the exact solution')
-    plt.colorbar()
-    plt.show()
 
-    x = 0
+
+plt.colorbar()    
+plt.show()
 
 
 
