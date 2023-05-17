@@ -3,6 +3,8 @@ import numpy as np
 
 
 class create_ref_data:
+
+    neval: int
     deg: list
     evaluation_points: np.ndarray
     quadrature_weights: np.ndarray
@@ -10,6 +12,7 @@ class create_ref_data:
     reference_basis_derivatives: np.ndarray
 
     def __init__(self, neval: int, deg: list, integrate: bool = False) -> None:
+        self.neval: int = neval
         self.deg: list = deg
         self.evaluation_points: np.ndarray = np.zeros(0)
         self.quadrature_weights: np.ndarray = np.zeros(0)
