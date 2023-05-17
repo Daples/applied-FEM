@@ -2,6 +2,7 @@ from utils import read_mat
 from fem.create_geometric_map import create_geometric_map
 from fem.create_ref_data import create_ref_data
 import numpy as np 
+import matplotlib.pyplot as plt
 
 def eval_func(ref_data, support_extractors, geom_map, current_element, coefs, n):
 
@@ -44,5 +45,25 @@ plot_grid_u = np.zeros((3,3))
 
 for current_element in range(fe_geometry.m):
     support_extractors = fe_space.support_extractors[current_element]
-    print(eval_func(ref_data, support_extractors, geom_map, current_element, coefs, 9))
+    u, _, _ = eval_func(ref_data, support_extractors, geom_map, current_element, coefs, 9)
+    x = geom_map.map[:,0,current_element]
+    y = geom_map.map[:,1,current_element]
+
+    for i in range(3):
+        for j in range(3):
+            I = j * 3 + i
+            plot_grid_x[i, j] = x[I]
+            plot_grid_y[i, j] = y[I]
+            plot_grid_u[i, j] = u[0,I]
+
+    plt.figure()
+    plt.contourf(plot_grid_x, plot_grid_y, plot_grid_u, cmap ='viridis')
+    plt.title('Heatmap of the exact solution')
+    plt.colorbar()
+    plt.show()
+
+    x = 0
+
+
+
 
