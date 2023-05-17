@@ -1,10 +1,13 @@
-from typing import cast
+from typing import cast, Any
 
 import numpy as np
+
+from scipy.io import loadmat
 
 from fem.param_map import ParametricMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
+from fem.fe_geometry import FEGeometry
 
 
 def eval_func(
@@ -49,3 +52,19 @@ def eval_func(
         )
 
     return xs, ns, dxns
+
+
+def read_mat(filename: str) -> tuple[Any, Any]:
+    """"""
+
+    mat = loadmat(filename)
+    geometry_contents = mat["fe_geometry"][0][0]
+    m = geometry_contents[0][0, 0]
+    map_coefficients = geometry_contents[1]
+    fe_geometry = FEGeometry(m, map_coefficients)
+
+    space_contents = mat["fe_space"][0][0]
+    n = space_contents[0][0, 0]
+    boundary_bases = space_contents[1]
+    support_and_extraction = space_contents[2]
+    return fe_geometry, None
