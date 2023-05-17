@@ -7,6 +7,7 @@ from scipy.io import loadmat
 from fem.param_map import ParametricMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
+from fem.space2D import SupportExtractor, Space2D
 from fem.fe_geometry import FEGeometry
 
 
@@ -59,12 +60,22 @@ def read_mat(filename: str) -> tuple[Any, Any]:
 
     mat = loadmat(filename)
     geometry_contents = mat["fe_geometry"][0][0]
-    m = geometry_contents[0][0, 0]
-    map_coefficients = geometry_contents[1]
+    m = geometry_contents["m"][0, 0]
+    map_coefficients = geometry_contents["map_coefficients"]
     fe_geometry = FEGeometry(m, map_coefficients)
 
     space_contents = mat["fe_space"][0][0]
-    n = space_contents[0][0, 0]
-    boundary_bases = space_contents[1]
-    support_and_extraction = space_contents[2]
-    return fe_geometry, None
+    n = space_contents["n"][0, 0]
+    boundary_bases = space_contents["boundary_bases"]
+    support_and_extraction = space_contents["support_and_extraction"]
+
+    support_extractors = []
+    for elem in support_and_extraction:
+        supported_bases = elem["supported_bases"]
+        extration_coefficients = elem["extraction_coefficients"]
+        support_extractors.append(
+            SupportExtractor(supported_bases, extration_coefficients)
+        )
+
+    fe_space = Space2D(n, boundary_bases, support_extractors)
+    return fe_geometry, fe_space
