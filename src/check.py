@@ -12,6 +12,7 @@ def eval_func(ref_data, support_extractors, geom_map, current_element, coefs, n)
 
     for i, j in enumerate(support_extractors.supported_bases[current_element]):
         ej_i = support_extractors.extraction_coefficients[i, :]
+        print(ej_i)
         ns += coefs[j] * ej_i.dot(ref_data.reference_basis)
         dxns += (
             coefs[j]
