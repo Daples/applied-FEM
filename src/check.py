@@ -10,9 +10,8 @@ def eval_func(ref_data, support_extractors, geom_map, current_element, coefs, n)
     dxns = np.zeros((1, n))
     dyns = np.zeros((1, n))
 
-    for i, j in enumerate(support_extractors.supported_bases[current_element]):
+    for i, j in enumerate(support_extractors.supported_bases):
         ej_i = support_extractors.extraction_coefficients[i, :]
-        print(ej_i)
         ns += coefs[j] * ej_i.dot(ref_data.reference_basis)
         dxns += (
             coefs[j]
@@ -35,7 +34,7 @@ geom_map = create_geometric_map(fe_geometry, ref_data)
 
 n = fe_space.n
 coefs = np.zeros((n))
-coefs[4] = 1
+coefs[3] = 1
 
 x, y = np.meshgrid(np.linspace(0,1,3),np.linspace(0,1,3))
 

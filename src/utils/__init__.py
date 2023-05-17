@@ -71,7 +71,7 @@ def read_mat(filename: str) -> tuple[Any, Any]:
 
     support_extractors = []
     for elem in support_and_extraction:
-        supported_bases = elem["supported_bases"]
+        supported_bases = elem["supported_bases"][0]
         extration_coefficients = elem["extraction_coefficients"][0]
         support_extractors.append(
             SupportExtractor(supported_bases, extration_coefficients)
