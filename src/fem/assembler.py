@@ -194,11 +194,11 @@ class Assembler:
             xs = geom_map.map[:,:,l]
             support_extractors = fe_space.support_extractors[l]
             det = np.multiply(
-                    geom_map.map_derivatives[:,0,:], 
-                    geom_map.map_derivatives[:,3,:]
+                    geom_map.map_derivatives[:,0,l], 
+                    geom_map.map_derivatives[:,3,l]
                 ) - np.multiply(
-                    geom_map.map_derivatives[:,1,:], 
-                    geom_map.map_derivatives[:,2,:]
+                    geom_map.map_derivatives[:,1,l], 
+                    geom_map.map_derivatives[:,2,l]
                 )
             for i_index, i in enumerate(support_extractors.supported_bases):
                 ej_i = support_extractors.extraction_coefficients[i_index, :]
@@ -241,7 +241,7 @@ class Assembler:
 
                     bar_A[i, j] += val
         
-        idxs = set(fe_space.boundary_bases.tolist())
+        idxs = set(fe_space.boundary_bases.squeeze().tolist())
         all_idxs = set(range(bar_A.shape[0]))
         idxs = all_idxs.difference(idxs)
 
