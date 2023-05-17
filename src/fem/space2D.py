@@ -24,6 +24,6 @@ class Space2D:
         boundary_bases: np.ndarray,
         support_extractors: list[SupportExtractor],
     ) -> None:
-        self.n: int = 0
+        self.n: int = n
         self.boundary_bases: np.ndarray = boundary_bases
         self.support_extractors: list[SupportExtractor] = support_extractors
