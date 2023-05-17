@@ -34,7 +34,7 @@ geom_map = create_geometric_map(fe_geometry, ref_data)
 
 n = fe_space.n
 coefs = np.zeros((n))
-coefs[3] = 1
+coefs[2] = 1
 
 x, y = np.meshgrid(np.linspace(0,1,3),np.linspace(0,1,3))
 
