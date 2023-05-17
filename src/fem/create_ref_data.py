@@ -1,4 +1,4 @@
-from reference_data import ReferenceData
+from fem.reference_data import ReferenceData
 import numpy as np
 
 
