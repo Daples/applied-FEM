@@ -27,17 +27,19 @@ def eval_func(ref_data, support_extractors, geom_map, current_element, coefs, n)
     return ns, dxns, dyns
 
 
-fe_geometry, fe_space = read_mat("data/star3.mat")
+fe_geometry, fe_space = read_mat("data/distressed_robotD.mat")
 
 ref_data = create_ref_data(20, [2, 2], False)
 geom_map = create_geometric_map(fe_geometry, ref_data)
 
 n = fe_space.n
+m = fe_geometry.m
 coefs = np.zeros((n))
-coefs[2] = 1
 
-x, y = np.meshgrid(np.linspace(0,1,3),np.linspace(0,1,3))
+idxs = fe_space.boundary_bases.squeeze().tolist()
 
+coefs = np.zeros((n))
+coefs[idxs] = 1
 
 plot_grid_x = np.zeros((20,20))
 plot_grid_y = np.zeros((20,20))
@@ -55,11 +57,11 @@ for current_element in range(fe_geometry.m):
             I = j * 20 + i
             plot_grid_x[i, j] = x[I]
             plot_grid_y[i, j] = y[I]
-            plot_grid_u[i, j] = dy[0,I]
+            plot_grid_u[i, j] = u[0,I]
 
 
-    plt.contourf(plot_grid_x, plot_grid_y, plot_grid_u, cmap ='viridis')
-    plt.title('Heatmap of the exact solution')
+    plt.contourf(plot_grid_x, plot_grid_y, plot_grid_u, cmap ='viridis', vmin=0, vmax=2)
+    plt.title(f"plot_{1}")
 
 
 plt.colorbar()    

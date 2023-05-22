@@ -58,79 +58,36 @@ u = np.linalg.solve(A,b)
 u_sol = np.zeros(fe_space.n)
 u_sol[idxs] = u
 
-n_plot = 3
-ref_data = create_ref_data(n_plot, [2, 2], True)
+n_plot = 20
+
+ref_data = create_ref_data(n_plot, [2, 2], False)
 geom_map = create_geometric_map(fe_geometry, ref_data)
 
-grid_x = np.zeros((n_plot, n_plot))
-grid_y = np.zeros((n_plot, n_plot))
-grid_u = np.zeros((n_plot, n_plot))
-grid_dx = np.zeros((n_plot, n_plot))
-grid_dy = np.zeros((n_plot, n_plot))
+plot_grid_x = np.zeros((n_plot,n_plot))
+plot_grid_y = np.zeros((n_plot,n_plot))
+plot_grid_u = np.zeros((n_plot,n_plot))
+plt.figure()
 
-xs = np.zeros((0,))
-ys = np.zeros((0,))
-us = np.zeros((0,))
-dxs = np.zeros((0,))
-dys = np.zeros((0,))
 for current_element in range(fe_geometry.m):
     support_extractors = fe_space.support_extractors[current_element]
-    u, dx, dy = eval_func(
-        ref_data, support_extractors, geom_map, current_element, u_sol, n_plot**2
-    )
-    x = geom_map.map[:, 0, current_element]
-    y = geom_map.map[:, 1, current_element]
+    u, dx, dy= eval_func(ref_data, support_extractors, geom_map, current_element, u_sol, n_plot ** 2)
+    x = geom_map.map[:,0,current_element]
+    y = geom_map.map[:,1,current_element]
 
     for i in range(n_plot):
         for j in range(n_plot):
             I = j * n_plot + i
-            grid_x[i, j] = x[I]
-            grid_y[i, j] = y[I]
-            grid_u[i, j] = u[0, I]
-            grid_dx[i, j] = dx[0, I]
-            grid_dy[i, j] = dy[0, I]
-
-    xs = np.hstack((xs, grid_x.ravel()))
-    ys = np.hstack((ys, grid_y.ravel()))
-    us = np.hstack((us, grid_u.ravel()))
-    dxs = np.hstack((dxs, grid_dx.ravel()))
-    dys = np.hstack((dys, grid_dy.ravel()))
+            plot_grid_x[i, j] = x[I]
+            plot_grid_y[i, j] = y[I]
+            plot_grid_u[i, j] = u[0,I]
 
 
-fig, axs = plt.subplots(2, 2, figsize=(15, 10), subplot_kw=dict(projection="3d"))
+    plt.contourf(plot_grid_x, plot_grid_y, plot_grid_u, cmap ='viridis', vmin=0, vmax=10)
+    plt.clim(0, 10) 
+    plt.title('Heatmap of the exact solution')
 
-surf = axs[0, 0].plot_trisurf(xs, ys, us, cmap="jet", linewidth=0)
-fig.colorbar(surf)
-axs[0, 0].set_xlabel("x")
-axs[0, 0].set_ylabel("y")
-axs[0, 0].set_zlabel("z")
-axs[0, 0].xaxis.set_major_locator(MaxNLocator(5))
-axs[0, 0].yaxis.set_major_locator(MaxNLocator(6))
-axs[0, 0].zaxis.set_major_locator(MaxNLocator(5))
-axs[0, 0].set_title("$N$")
 
-surf = axs[0, 1].plot_trisurf(xs, ys, dxs, cmap="jet", linewidth=0)
-fig.colorbar(surf)
-axs[0, 1].xaxis.set_major_locator(MaxNLocator(5))
-axs[0, 1].yaxis.set_major_locator(MaxNLocator(6))
-axs[0, 1].zaxis.set_major_locator(MaxNLocator(5))
-axs[0, 1].set_title("$N_x$")
-axs[0, 1].set_xlabel("x")
-axs[0, 1].set_ylabel("y")
-axs[0, 1].set_zlabel("z")
-
-surf = axs[1, 1].plot_trisurf(xs, ys, dys, cmap="jet", linewidth=0)
-fig.colorbar(surf)
-axs[1, 1].xaxis.set_major_locator(MaxNLocator(5))
-axs[1, 1].yaxis.set_major_locator(MaxNLocator(6))
-axs[1, 1].zaxis.set_major_locator(MaxNLocator(5))
-axs[1, 1].set_title("$N_y$")
-axs[1, 1].set_xlabel("x")
-axs[1, 1].set_ylabel("y")
-axs[1, 1].set_zlabel("z")
-
-fig.tight_layout()
-plt.savefig("test.pdf")
-plt.show()  # or:
+plt.colorbar()    
+plt.show()
 
 
