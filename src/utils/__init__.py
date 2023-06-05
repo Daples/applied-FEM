@@ -55,10 +55,11 @@ def eval_func(
     return xs, ns, dxns
 
 
-def read_mat(filename: str) -> tuple[Any, Any]:
+def read_mat(filename: str) -> tuple[Any, ...]:
     """"""
 
     mat = loadmat(filename)
+    p = mat["p"][0].tolist()
     geometry_contents = mat["fe_geometry"][0][0]
     m = geometry_contents["m"][0, 0]
     map_coefficients = geometry_contents["map_coefficients"]
@@ -78,4 +79,4 @@ def read_mat(filename: str) -> tuple[Any, Any]:
         )
 
     fe_space = Space2D(n, boundary_bases, support_extractors)
-    return fe_geometry, fe_space
+    return p, fe_geometry, fe_space
