@@ -1,6 +1,6 @@
 from utils import read_mat
-from fem.create_geometric_map import create_geometric_map
-from fem.create_ref_data import create_ref_data
+from fem.bi_dim_geometric_map import BidimensionalGeometricMap
+from fem.bi_dim_reference_data import BidimensionalReferenceData
 import numpy as np
 import matplotlib.pyplot as plt
 from fem.assembler import Assembler
@@ -46,8 +46,8 @@ problem_L = lambda x, Nj, dxNj, dyNj: Nj
 
 p, fe_geometry, fe_space = read_mat("data/distressed_robotD.mat")
 
-ref_data = create_ref_data(3, p, True)
-geom_map = create_geometric_map(fe_geometry, ref_data)
+ref_data = BidimensionalReferenceData(3, p, True)
+geom_map = BidimensionalGeometricMap(fe_geometry, ref_data)
 
 A, b, idxs = Assembler.two_dimensional(
     fe_space, ref_data, geom_map, fe_geometry, problem_B, problem_L
@@ -60,15 +60,18 @@ u_sol[idxs] = u
 
 n_plot = 20
 
-ref_data = create_ref_data(n_plot, p, False)
-geom_map = create_geometric_map(fe_geometry, ref_data)
+ref_data = BidimensionalReferenceData(n_plot, p, False)
+geom_map = BidimensionalGeometricMap(fe_geometry, ref_data)
 
 plot_grid_x = np.zeros((n_plot, n_plot))
 plot_grid_y = np.zeros((n_plot, n_plot))
 plot_grid_u = np.zeros((n_plot, n_plot))
 plt.figure()
 
+max_us = []
 for current_element in range(fe_geometry.m):
+    levels = np.linspace(0, 12, 16)
+
     support_extractors = fe_space.support_extractors[current_element]
     u, dx, dy = eval_func(
         ref_data, support_extractors, geom_map, current_element, u_sol, n_plot**2
@@ -83,10 +86,20 @@ for current_element in range(fe_geometry.m):
             plot_grid_y[i, j] = y[I]
             plot_grid_u[i, j] = u[0, I]
 
-    plt.contourf(plot_grid_x, plot_grid_y, plot_grid_u, cmap="viridis", vmin=0, vmax=10)
-    plt.clim(0, 10)
-    plt.title("Heatmap of the exact solution")
+    max_us.append(plot_grid_u.max())
+    plt.contourf(
+        plot_grid_x,
+        plot_grid_y,
+        plot_grid_u,
+        levels=levels,
+        cmap="viridis",
+    )
+    plt.xlabel("$x$")
+    plt.ylabel("$y$")
+    plt.title("FE solution")
 
 
 plt.colorbar()
+print(max(max_us))
+plt.savefig("figs/h.pdf", bbox_inches="tight")
 plt.show()
