@@ -6,8 +6,8 @@ from fem.mesh import Mesh
 from fem.param_map import ParametricMap
 from fem.reference_data import ReferenceData
 from fem.space import Space
-from fem.create_geometric_map import create_geometric_map
-from fem.create_ref_data import create_ref_data
+from fem.bi_dim_geometric_map import BidimensionalGeometricMap
+from fem.bi_dim_reference_data import BidimensionalReferenceData
 from utils._typing import BilinearForm, LinearForm, BilinearForm_2D, LinearForm_2D
 
 
@@ -182,65 +182,85 @@ class Assembler:
         geom_map,
         fe_geometry,
         problem_B: BilinearForm_2D,
-        problem_L: LinearForm_2D
+        problem_L: LinearForm_2D,
     ) -> tuple[np.ndarray, np.ndarray, list[int]]:
-
         n = fe_space.n
         bar_A = np.zeros((n, n))
         bar_b = np.zeros(n)
 
         for l in range(fe_geometry.m):
-
-            xs = geom_map.map[:,:,l]
+            xs = geom_map.map[:, :, l]
             support_extractors = fe_space.support_extractors[l]
             det = np.multiply(
-                    geom_map.map_derivatives[:,0,l], 
-                    geom_map.map_derivatives[:,3,l]
-                ) - np.multiply(
-                    geom_map.map_derivatives[:,1,l], 
-                    geom_map.map_derivatives[:,2,l]
-                )
+                geom_map.map_derivatives[:, 0, l], geom_map.map_derivatives[:, 3, l]
+            ) - np.multiply(
+                geom_map.map_derivatives[:, 1, l], geom_map.map_derivatives[:, 2, l]
+            )
             for i_index, i in enumerate(support_extractors.supported_bases):
                 ej_i = support_extractors.extraction_coefficients[i_index, :]
                 ni = ej_i.dot(ref_data.reference_basis)
-                dxni = (
-                    ej_i.dot(np.multiply(geom_map.imap_derivatives[:,0,l], ref_data.reference_basis_derivatives[:,:,0])
-                            +np.multiply(geom_map.imap_derivatives[:,1,l], ref_data.reference_basis_derivatives[:,:,1]))
+                dxni = ej_i.dot(
+                    np.multiply(
+                        geom_map.imap_derivatives[:, 0, l],
+                        ref_data.reference_basis_derivatives[:, :, 0],
+                    )
+                    + np.multiply(
+                        geom_map.imap_derivatives[:, 1, l],
+                        ref_data.reference_basis_derivatives[:, :, 1],
+                    )
                 )
-                dyni = (
-                    ej_i.dot(np.multiply(geom_map.imap_derivatives[:,2,l], ref_data.reference_basis_derivatives[:,:,0])
-                            +np.multiply(geom_map.imap_derivatives[:,3,l], ref_data.reference_basis_derivatives[:,:,1]))
+                dyni = ej_i.dot(
+                    np.multiply(
+                        geom_map.imap_derivatives[:, 2, l],
+                        ref_data.reference_basis_derivatives[:, :, 0],
+                    )
+                    + np.multiply(
+                        geom_map.imap_derivatives[:, 3, l],
+                        ref_data.reference_basis_derivatives[:, :, 1],
+                    )
                 )
 
                 l_val = problem_L(xs, ni, dxni, dyni)
 
                 val = np.sum(
-                    np.multiply(det,
-                        np.multiply(l_val, ref_data.quadrature_weights)
-                    ))
+                    np.multiply(det, np.multiply(l_val, ref_data.quadrature_weights))
+                )
                 bar_b[i] += val
 
                 for j_index, j in enumerate(support_extractors.supported_bases):
                     ej_i = support_extractors.extraction_coefficients[j_index, :]
                     nj = ej_i.dot(ref_data.reference_basis)
-                    dxnj = (
-                        ej_i.dot(np.multiply(geom_map.imap_derivatives[:,0,l], ref_data.reference_basis_derivatives[:,:,0])
-                                +np.multiply(geom_map.imap_derivatives[:,1,l], ref_data.reference_basis_derivatives[:,:,1]))
+                    dxnj = ej_i.dot(
+                        np.multiply(
+                            geom_map.imap_derivatives[:, 0, l],
+                            ref_data.reference_basis_derivatives[:, :, 0],
+                        )
+                        + np.multiply(
+                            geom_map.imap_derivatives[:, 1, l],
+                            ref_data.reference_basis_derivatives[:, :, 1],
+                        )
                     )
-                    dynj = (
-                        ej_i.dot(np.multiply(geom_map.imap_derivatives[:,2,l], ref_data.reference_basis_derivatives[:,:,0])
-                                +np.multiply(geom_map.imap_derivatives[:,3,l], ref_data.reference_basis_derivatives[:,:,1]))
+                    dynj = ej_i.dot(
+                        np.multiply(
+                            geom_map.imap_derivatives[:, 2, l],
+                            ref_data.reference_basis_derivatives[:, :, 0],
+                        )
+                        + np.multiply(
+                            geom_map.imap_derivatives[:, 3, l],
+                            ref_data.reference_basis_derivatives[:, :, 1],
+                        )
                     )
 
                     b_val = problem_B(xs, ni, dxni, dyni, nj, dxnj, dynj)
 
                     val = np.sum(
-                        np.multiply(det,
-                        np.multiply(b_val, ref_data.quadrature_weights)
-                    ))
+                        np.multiply(
+                            det, np.multiply(b_val, ref_data.quadrature_weights)
+                        )
+                    )
 
                     bar_A[i, j] += val
-        
+
         idxs = set(fe_space.boundary_bases.squeeze().tolist())
         all_idxs = set(range(bar_A.shape[0]))
         idxs = list(all_idxs.difference(idxs))

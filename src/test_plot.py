@@ -1,6 +1,6 @@
 from utils import read_mat
-from fem.create_geometric_map import create_geometric_map
-from fem.create_ref_data import create_ref_data
+from fem.bi_dim_geometric_map import BidimensionalGeometricMap
+from fem.bi_dim_reference_data import BidimensionalReferenceData
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -42,8 +42,8 @@ def eval_func(ref_data, support_extractors, geom_map, current_element, coefs, n)
 
 fe_geometry, fe_space = read_mat("data/star3.mat")
 
-ref_data = create_ref_data(20, [2, 2], False)
-geom_map = create_geometric_map(fe_geometry, ref_data)
+ref_data = BidimensionalReferenceData(20, [2, 2], False)
+geom_map = BidimensionalGeometricMap(fe_geometry, ref_data)
 
 n = fe_space.n
 coefs = np.zeros((n))
